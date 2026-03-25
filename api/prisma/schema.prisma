@@ -1,14 +1,125 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+// This is your Prisma schema file for SAE CdM 2026
+// Generated from db/schema.sql + triggers
 
 generator client {
   provider = "prisma-client-js"
-  // output   = "../src/generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
 }
+
+model Equipe {
+  id_equipe   Int      @id @default(autoincrement()) @map("id_equipe")
+  nom         String   @unique
+  classement  Int?
+  points_fifa Decimal?
+
+  @@map("equipe")
+}
+
+model Groupe {
+  id_groupe Int    @id @default(autoincrement()) @map("id_groupe")
+  nom       String @unique
+
+  matchs    MatchCdm2026[]
+  classement ClassementGroupe[]
+
+  @@map("groupe")
+}
+
+model MatchHistorique {
+  id_match   Int      @id @default(autoincrement())
+  date_match DateTime?
+  equipe1    String?
+  equipe2    String?
+  score1     Int?
+  score2     Int?
+  tournoi    String?
+  pays       String?
+
+  @@map("match_historique")
+}
+
+model MatchCdm2026 {
+  id_match_wc Int        @id @default(autoincrement()) @map("id_match_wc")
+  numero      Int?
+  phase       String?
+  equipe_dom  String?
+  equipe_ext  String?
+  id_groupe   Int?
+
+  groupe      Groupe?     @relation(fields: [id_groupe], references: [id_groupe])
+  resultats   Resultat[]
+  predictions Prediction[]
+
+  @@map("match_cdm2026")
+}
+
+model Resultat {
+  id_resultat Int           @id @default(autoincrement()) @map("id_resultat")
+  id_match_wc Int           @unique @map("id_match_wc")
+  score_dom   Int?
+  score_ext   Int?
+  date_saisie DateTime?     @default(now()) @map("date_saisie")
+
+  match       MatchCdm2026 @relation(fields: [id_match_wc], references: [id_match_wc])
+
+  @@map("resultat")
+}
+
+model Utilisateur {
+  id_utilisateur Int       @id @default(autoincrement()) @map("id_utilisateur")
+  login          String    @unique
+  password       String
+  role           String?   @default("visiteur")
+
+  tokens TokenApi[]
+
+  @@map("utilisateur")
+}
+
+model TokenApi {
+  id_token        Int        @id @default(autoincrement()) @map("id_token")
+  id_utilisateur  Int        @map("id_utilisateur")
+  token           String     @unique
+  date_creation   DateTime?  @default(now()) @map("date_creation")
+  date_expiration DateTime?
+  actif           Boolean?   @default(true)
+
+  utilisateur Utilisateur @relation(fields: [id_utilisateur], references: [id_utilisateur])
+
+  @@map("token_api")
+}
+
+model Prediction {
+  id_prediction Int           @id @default(autoincrement()) @map("id_prediction")
+  id_match_wc   Int           @unique @map("id_match_wc")
+  proba_dom     Decimal? 
+  proba_nul     Decimal?
+  proba_ext     Decimal?
+  date_calcul   DateTime?     @default(now()) @map("date_calcul")
+
+  match MatchCdm2026 @relation(fields: [id_match_wc], references: [id_match_wc])
+
+  @@map("prediction")
+}
+
+model ClassementGroupe {
+  id_classement Int  @id @default(autoincrement()) @map("id_classement")
+  id_groupe     Int  @map("id_groupe")
+  equipe        String
+  points        Int  @default(0)
+  buts_pour     Int  @default(0)
+  buts_contre   Int  @default(0)
+  matchs_joues  Int  @default(0)
+  victoires     Int  @default(0)
+  nuls          Int  @default(0)
+  defaites      Int  @default(0)
+
+  groupe Groupe @relation(fields: [id_groupe], references: [id_groupe])
+
+  @@unique([id_groupe, equipe])
+  @@map("classement_groupe")
+}
+
