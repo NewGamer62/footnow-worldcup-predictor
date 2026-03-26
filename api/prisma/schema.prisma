@@ -83,7 +83,7 @@ model TokenApi {
   id_token        Int        @id @default(autoincrement()) @map("id_token")
   id_utilisateur  Int        @map("id_utilisateur")
   token           String     @unique
-  date_creation   DateTime?  @default(now()) @map("date_creation")
+  date_creation   DateTime?  @default(now()) @map(  "date_creation")
   date_expiration DateTime?
   actif           Boolean?   @default(true)
 

@@ -1,8 +1,11 @@
 import express from 'express'
 import type {Request, Response} from 'express';
 import crypto from 'node:crypto'
+import bcrypt from 'bcrypt'
 import { prisma } from './client.js'
 import router from './routes.js'
+
+const SALT_ROUNDS = 10
 
 const app = express()
 app.use(express.json())
@@ -29,7 +32,7 @@ app.get('/api/health', async ( _req: Request, res: Response) => {
   }
 })
 
-// Login, crypte le mot de passe er genère un token
+// Login, vérifie le mot de passe hashé et génère un token
 app.post('/api/login', async (req: Request, res: Response) => {
   try {
     const { login, password } = req.body ?? {}
@@ -44,7 +47,15 @@ app.post('/api/login', async (req: Request, res: Response) => {
       where: { login }
     })
 
-    if (!user || user.password !== password) {
+    if (!user) {
+      return res.status(401).json({
+        error: 'Identifiants invalides'
+      })
+    }
+
+    // Vérification du mot de passe avec bcrypt
+    const passwordValid = await bcrypt.compare(password, user.password)
+    if (!passwordValid) {
       return res.status(401).json({
         error: 'Identifiants invalides'
       })
@@ -81,8 +92,97 @@ app.post('/api/login', async (req: Request, res: Response) => {
   }
 })
 
+// Register - Inscription d'un nouvel utilisateur
+app.post('/api/register', async (req: Request, res: Response) => {
+  try {
+    const { login, password } = req.body ?? {}
+
+    if (!login || !password) {
+      return res.status(400).json({
+        error: 'login et password requis'
+      })
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({
+        error: 'Le mot de passe doit contenir au moins 6 caractères'
+      })
+    }
+
+    // Vérifie si l'utilisateur existe déjà
+    const existingUser = await prisma.utilisateur.findUnique({
+      where: { login }
+    })
+
+    if (existingUser) {
+      return res.status(409).json({
+        error: 'Ce login est déjà utilisé'
+      })
+    }
+
+    // Hash du mot de passe
+    const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS)
+
+    // Création de l'utilisateur
+    const newUser = await prisma.utilisateur.create({
+      data: {
+        login,
+        password: hashedPassword,
+        role: 'visiteur'
+      }
+    })
+
+    return res.status(201).json({
+      message: 'Utilisateur créé avec succès',
+      user: {
+        id_utilisateur: newUser.id_utilisateur,
+        login: newUser.login,
+        role: newUser.role
+      }
+    })
+  } catch (error) {
+    console.error('Erreur register:', error)
+    return res.status(500).json({
+      error: 'Erreur lors de l\'inscription'
+    })
+  }
+})
+
+// Logout (le token expire automatiquement)
+app.post('/api/logout', async (req: Request, res: Response) => {
+  try {
+    const authHeader = req.headers.authorization
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ error: 'Token manquant' })
+    }
+
+    const token = authHeader.slice('Bearer '.length).trim()
+
+    // Désactive le token
+    const result = await prisma.tokenApi.updateMany({
+      where: { token },
+      data: { actif: false }
+    })
+
+    if (result.count === 0) {
+      return res.status(404).json({ error: 'Token non trouvé' })
+    }
+
+    return res.status(200).json({
+      message: 'Déconnexion réussie'
+    })
+  } catch (error) {
+    console.error('Erreur logout:', error)
+    return res.status(500).json({
+      error: 'Erreur lors de la déconnexion'
+    })
+  }
+})
+
 app.use('/api', async (req: Request, res: Response, next) => {
-  if (req.path === '/health' || req.path === '/login') {
+  // Routes publiques (pas besoin d'authentification)
+  const publicPaths = ['/health', '/login', '/register']
+  if (publicPaths.includes(req.path)) {
     return next()
   }
 
