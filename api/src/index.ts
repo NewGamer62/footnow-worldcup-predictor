@@ -10,6 +10,18 @@ const SALT_ROUNDS = 10
 const app = express()
 app.use(express.json())
 
+app.use((_req: Request, res: Response, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*')
+  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS')
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+
+  if (_req.method === 'OPTIONS') {
+    return res.sendStatus(204)
+  }
+
+  next()
+})
+
 // Vérifie le statut de l'API et base de données
 app.get('/api/health', async ( _req: Request, res: Response) => {
   try {
@@ -181,8 +193,21 @@ app.post('/api/logout', async (req: Request, res: Response) => {
 
 app.use('/api', async (req: Request, res: Response, next) => {
   // Routes publiques (pas besoin d'authentification)
-  const publicPaths = ['/health', '/login', '/register']
-  if (publicPaths.includes(req.path)) {
+  const normalizedPath = req.path.replace(/^\/api/, '')
+  const isPublicPath =
+    normalizedPath === '/health' ||
+    normalizedPath === '/login' ||
+    normalizedPath === '/register' ||
+    normalizedPath === '/equipes' ||
+    normalizedPath === '/matchs-historique' ||
+    normalizedPath === '/groupes' ||
+    normalizedPath === '/favoris' ||
+    normalizedPath === '/probabilites-2026' ||
+    /^\/scores\/fifa\/[^/]+$/.test(normalizedPath) ||
+    /^\/scores\/forme\/[^/]+$/.test(normalizedPath) ||
+    /^\/scores\/h2h\/[^/]+\/[^/]+$/.test(normalizedPath)
+
+  if (isPublicPath) {
     return next()
   }
 

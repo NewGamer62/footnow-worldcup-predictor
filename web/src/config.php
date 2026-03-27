@@ -1,8 +1,17 @@
-// Auteur : Noa Gaillard
 <?php
-// URL interne au réseau Docker pour que le container PHP parle au container API
-define('API_URL', 'http://api:3070/api'); 
 
-// URL publique (utile pour les redirections si besoin, ou JS)
-define('PUBLIC_URL', 'http://localhost:8080'); 
-?>
+if (!defined('API_URL')) {
+    define('API_URL', 'http://api:3070');
+}
+
+function callAPI($endpoint) {
+    $url = API_URL . $endpoint;
+
+    $response = @file_get_contents($url);
+
+    if ($response === FALSE) {
+        return null;
+    }
+
+    return json_decode($response, true);
+}
