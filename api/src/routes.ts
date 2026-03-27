@@ -5,6 +5,151 @@ import { prisma } from './client.js'
 const router = Router()
 
 /**
+ * GET /api/equipes
+ * Retourne le classement des équipes (nom, classement, points FIFA)
+ */
+router.get('/equipes', async (_req: Request, res: Response) => {
+  try {
+    const equipes = await prisma.equipe.findMany({
+      orderBy: [
+        { classement: 'asc' },
+        { points_fifa: 'desc' }
+      ],
+      select: {
+        nom: true,
+        classement: true,
+        points_fifa: true
+      }
+    })
+
+    res.json({
+      total: equipes.length,
+      equipes: equipes.map((equipe: any, index: number) => ({
+        nom: equipe.nom,
+        classement: equipe.classement ?? index + 1,
+        points_fifa: equipe.points_fifa
+      }))
+    })
+  } catch (error) {
+    console.error('Erreur lors de la récupération des équipes:', error)
+    res.status(500).json({
+      error: 'Erreur lors de la récupération des équipes',
+      details: error instanceof Error ? error.message : 'Erreur inconnue'
+    })
+  }
+})
+
+/**
+ * GET /api/matchs-historique
+ * Retourne les derniers matchs historiques
+ */
+router.get('/matchs-historique', async (_req: Request, res: Response) => {
+  try {
+    const matchs = await prisma.matchHistorique.findMany({
+      orderBy: [
+        { date_match: 'desc' },
+        { id_match: 'desc' }
+      ],
+      take: 50,
+      select: {
+        date_match: true,
+        equipe1: true,
+        equipe2: true,
+        score1: true,
+        score2: true,
+        tournoi: true,
+        pays: true
+      }
+    })
+
+    res.json({
+      total: matchs.length,
+      matchs
+    })
+  } catch (error) {
+    console.error('Erreur lors de la récupération des matchs historiques:', error)
+    res.status(500).json({
+      error: 'Erreur lors de la récupération des matchs historiques',
+      details: error instanceof Error ? error.message : 'Erreur inconnue'
+    })
+  }
+})
+
+/**
+ * GET /api/groupes
+ * Retourne la liste des groupes
+ */
+router.get('/groupes', async (_req: Request, res: Response) => {
+  try {
+    const groupes = await prisma.groupe.findMany({
+      orderBy: { nom: 'asc' },
+      select: {
+        id_groupe: true,
+        nom: true
+      }
+    })
+
+    res.json({
+      total: groupes.length,
+      groupes
+    })
+  } catch (error) {
+    console.error('Erreur lors de la récupération des groupes:', error)
+    res.status(500).json({
+      error: 'Erreur lors de la récupération des groupes',
+      details: error instanceof Error ? error.message : 'Erreur inconnue'
+    })
+  }
+})
+
+/**
+ * GET /api/probabilites-2026
+ * Estime les probabilités de titre pour 2026 via les points FIFA
+ */
+router.get('/probabilites-2026', async (_req: Request, res: Response) => {
+  try {
+    const equipes = await prisma.equipe.findMany({
+      where: { points_fifa: { not: null } },
+      orderBy: { points_fifa: 'desc' },
+      take: 20,
+      select: {
+        nom: true,
+        points_fifa: true,
+        classement: true
+      }
+    })
+
+    const totalPoints = equipes.reduce((acc: number, team: any) => {
+      const points = Number(team.points_fifa) || 0
+      return acc + points
+    }, 0)
+
+    const favoris = equipes.map((team: any, index: number) => {
+      const points = Number(team.points_fifa) || 0
+      const probabilite = totalPoints > 0 ? (points / totalPoints) * 100 : 0
+
+      return {
+        classement: team.classement ?? index + 1,
+        equipe: team.nom,
+        points_fifa: points,
+        probabilite_titulo: Number(probabilite.toFixed(2))
+      }
+    })
+
+    res.json({
+      total: favoris.length,
+      favoris
+    })
+  } catch (error) {
+    console.error('Erreur lors du calcul des probabilités 2026:', error)
+    res.status(500).json({
+      error: 'Erreur lors du calcul des probabilités 2026',
+      details: error instanceof Error ? error.message : 'Erreur inconnue'
+    })
+  }
+})
+
+/**
  * GET /api/scores/fifa/:equipe
  * Obtient le score FIFA normalisé (0-1) pour une équipe
  */

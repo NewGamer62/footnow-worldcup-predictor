@@ -1,0 +1,12 @@
+[
+  { "rank": 1, "team": "Argentina", "points": 1860 },
+  { "rank": 2, "team": "France", "points": 1837 },
+  { "rank": 3, "team": "Brazil", "points": 1834 },
+  { "rank": 4, "team": "England", "points": 1794 },
+  { "rank": 5, "team": "Belgium", "points": 1792 },
+  { "rank": 6, "team": "Croatia", "points": 1747 },
+  { "rank": 7, "team": "Netherlands", "points": 1743 },
+  { "rank": 8, "team": "Italy", "points": 1726 },
+  { "rank": 9, "team": "Portugal", "points": 1718 },
+  { "rank": 10, "team": "Spain", "points": 1710 }
+]

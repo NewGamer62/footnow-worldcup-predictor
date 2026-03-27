@@ -1,10 +1,8 @@
-import { PrismaClient } from '@prisma/client'
 import { parse } from 'csv-parse/sync'
 import fs from 'fs'
 import path from 'path'
 import bcrypt from 'bcrypt'
-
-const prisma = new PrismaClient()
+import { prisma } from '../src/client.js'
 
 async function main() {
   console.log('🚀 Début du seed Coupe du Monde 2026...')
