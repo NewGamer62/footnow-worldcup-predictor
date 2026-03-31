@@ -5,6 +5,230 @@ import { prisma } from './client.js'
 const router = Router()
 
 /**
+ * GET /api/equipes
+ * Retourne le classement des équipes (nom, classement, points FIFA)
+ */
+router.get('/equipes', async (_req: Request, res: Response) => {
+  try {
+    const equipes = await prisma.equipe.findMany({
+      orderBy: [
+        { classement: 'asc' },
+        { points_fifa: 'desc' }
+      ],
+      select: {
+        nom: true,
+        classement: true,
+        points_fifa: true
+      }
+    })
+
+    res.json({
+      total: equipes.length,
+      equipes: equipes.map((equipe: any, index: number) => ({
+        nom: equipe.nom,
+        classement: equipe.classement ?? index + 1,
+        points_fifa: equipe.points_fifa
+      }))
+    })
+  } catch (error) {
+    console.error('Erreur lors de la récupération des équipes:', error)
+    res.status(500).json({
+      error: 'Erreur lors de la récupération des équipes',
+      details: error instanceof Error ? error.message : 'Erreur inconnue'
+    })
+  }
+})
+
+/**
+ * GET /api/matchs-historique
+ * Retourne les derniers matchs historiques
+ */
+router.get('/matchs-historique', async (req: Request, res: Response) => {
+  try {
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 50;
+    const skip = (page - 1) * limit;
+
+    const [matchs, total] = await prisma.$transaction([
+      prisma.matchHistorique.findMany({
+        orderBy: [
+          { date_match: 'desc' },
+          { id_match: 'desc' }
+        ],
+        skip,
+        take: limit,
+        select: {
+          date_match: true,
+          equipe1: true,
+          equipe2: true,
+          score1: true,
+          score2: true,
+          tournoi: true,
+          pays: true
+        }
+      }),
+      prisma.matchHistorique.count()
+    ]);
+
+    res.json({
+      page,
+      limit,
+      total,
+      pages: Math.ceil(total / limit),
+      matchs
+    })
+  } catch (error) {
+    console.error('Erreur matchs historiques:', error)
+    res.status(500).json({ error: 'Erreur serveur' })
+  }
+})
+
+/**
+ * GET /api/matchs-cdm2026
+ * Tous les matchs CDM 2026
+ */
+router.get('/matchs-cdm2026', async (req: Request, res: Response) => {
+  try {
+    const matchs = await prisma.matchCdm2026.findMany({
+      include: {
+        groupe: true,
+        predictions: true
+      },
+      orderBy: { numero: 'asc' }
+    })
+
+    res.json({
+      total: matchs.length,
+      matchs
+    })
+  } catch (error) {
+    console.error('Erreur matchs CDM:', error)
+    res.status(500).json({ error: 'Erreur serveur' })
+  }
+})
+
+/**
+ * GET /api/groupes
+ * Retourne la liste des groupes
+ */
+router.get('/groupes', async (_req: Request, res: Response) => {
+  try {
+    const groupes = await prisma.groupe.findMany({
+      orderBy: { nom: 'asc' },
+      select: {
+        id_groupe: true,
+        nom: true
+      }
+    })
+
+    res.json({
+      total: groupes.length,
+      groupes
+    })
+  } catch (error) {
+    console.error('Erreur lors de la récupération des groupes:', error)
+    res.status(500).json({
+      error: 'Erreur lors de la récupération des groupes',
+      details: error instanceof Error ? error.message : 'Erreur inconnue'
+    })
+  }
+})
+
+/**
+ * GET /api/probabilites-2026
+ * Calcule les probabilités de titre avec : 70% classement FIFA + 30% forme récente
+ */
+router.get('/probabilites-2026', async (_req: Request, res: Response) => {
+  try {
+    // Récupérer les équipes qualifiées pour la CDM 2026
+    const qualifiees = await prisma.matchCdm2026.findMany({
+      select: { equipe_dom: true, equipe_ext: true }
+    });
+    
+    const nomsEquipes = new Set<string>();
+    qualifiees.forEach(m => {
+      if (m.equipe_dom && m.equipe_dom !== 'To be announced') nomsEquipes.add(m.equipe_dom);
+      if (m.equipe_ext && m.equipe_ext !== 'To be announced') nomsEquipes.add(m.equipe_ext);
+    });
+    
+    // Récupérer les équipes avec leurs stats
+    const equipes = await prisma.equipe.findMany({
+      where: { 
+        points_fifa: { not: null },
+        nom: { in: Array.from(nomsEquipes) }
+      },
+      orderBy: { points_fifa: 'desc' },
+      take: 20
+    });
+    
+    // Calculer les scores
+    const scores = [];
+    let totalScore = 0;
+    
+    // Normalisation des points FIFA (min-max)
+    const pointsFifa = equipes.map(e => Number(e.points_fifa) || 0);
+    const maxFifa = Math.max(...pointsFifa);
+    const minFifa = Math.min(...pointsFifa);
+    
+    for (const equipe of equipes) {
+      // 1. Score Classement FIFA (normalisé entre 0 et 1)
+      const points = Number(equipe.points_fifa) || 0;
+      const scoreClassement = maxFifa !== minFifa 
+        ? (points - minFifa) / (maxFifa - minFifa) 
+        : 0.5;
+      
+      // 2. Score Forme (moyenne des 20 derniers matchs)
+      const formeData = await prisma.$queryRaw<Array<{ get_forme_recente: number }>>`
+        SELECT get_forme_recente(${equipe.nom}) as get_forme_recente
+      `;
+      let scoreForme = formeData[0]?.get_forme_recente || 0.5;
+      
+      // 3. Score final (70% classement, 30% forme)
+      const scoreFinal = (scoreClassement * 0.7) + (scoreForme * 0.3);
+      
+      scores.push({
+        equipe: equipe.nom,
+        classement: equipe.classement,
+        points_fifa: points,
+        score_classement: scoreClassement,
+        score_forme: scoreForme,
+        score_final: scoreFinal
+      });
+      
+      totalScore += scoreFinal;
+    }
+    
+    // Calculer les probabilités
+    const favoris = scores.map((s, index) => ({
+      classement: s.classement ?? index + 1,
+      equipe: s.equipe,
+      points_fifa: s.points_fifa,
+      score_classement: Number((s.score_classement * 100).toFixed(1)),
+      score_forme: Number((s.score_forme * 100).toFixed(1)),
+      probabilite_titulo: Number(((s.score_final / totalScore) * 100).toFixed(2))
+    }));
+    
+    // Trier par probabilité décroissante
+    favoris.sort((a, b) => b.probabilite_titulo - a.probabilite_titulo);
+    
+    favoris.forEach((f, index) => {
+    f.classement = index + 1;
+    });
+    
+    res.json({
+      total: favoris.length,
+      favoris
+    });
+  } catch (error) {
+    console.error('Erreur lors du calcul des probabilités 2026:', error)
+    res.status(500).json({
+      error: 'Erreur lors du calcul des probabilités 2026',
+      details: error instanceof Error ? error.message : 'Erreur inconnue'
+    })
+  }
+})
+
+/**
  * GET /api/scores/fifa/:equipe
  * Obtient le score FIFA normalisé (0-1) pour une équipe
  */

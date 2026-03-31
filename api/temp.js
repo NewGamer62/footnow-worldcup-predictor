@@ -1,0 +1,1 @@
+import { parse } from "csv-parse/sync"; import * as fs from "fs"; async function main(){const rankingPath = "/data/fifa_ranking_2026_complet.csv";console.log("Seeding...");}main();

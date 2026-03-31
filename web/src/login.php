@@ -1,34 +1,24 @@
-// Auteur : Noa Gaillard
 <?php
 session_start();
-require_once 'includes/config.php';
 
 $error = null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = $_POST['email'] ?? '';
-    $password = $_POST['password'] ?? '';
+    $email = $_POST['email'];
+    $password = $_POST['password'];
 
-    $options = [
-        'http' => [
-            'method'  => 'POST',
-            'header'  => "Content-Type: application/json\r\n",
-            'content' => json_encode(['email' => $email, 'password' => $password]),
-            'ignore_errors' => true
-        ]
-    ];
+    if (
+        isset($_SESSION['registered_email']) &&
+        $email === $_SESSION['registered_email'] &&
+        $password === $_SESSION['registered_password']
+    ) {
+        $_SESSION['user_token'] = "fake_token";
+        $_SESSION['user_email'] = $email;
 
-    $context  = stream_context_create($options);
-    $result = file_get_contents(API_URL . '/auth/login', false, $context);
-    $response = json_decode($result, true);
-
-    if (isset($response['token'])) {
-        $_SESSION['user_token'] = $response['token'];
-        $_SESSION['user_email'] = $email; // Optionnel : pour l'affichage
-        header('Location: /dashboard.php');
+        header("Location: index.php");
         exit();
     } else {
-        $error = $response['message'] ?? "Identifiants incorrects.";
+        $error = "Identifiants incorrects";
     }
 }
 ?>
@@ -36,20 +26,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <title>Connexion - CDM 2026</title>
-</head>
-<body>
-    <h1>Connexion</h1>
-    <?php if ($error): ?>
-        <p style="color: red;"><?php echo htmlspecialchars($error); ?></p>
-    <?php endif; ?>
+<meta charset="UTF-8">
+<title>Connexion</title>
 
-    <form method="POST">
-        <input type="email" name="email" placeholder="Email" required><br>
-        <input type="password" name="password" placeholder="Mot de passe" required><br>
-        <button type="submit">Se connecter</button>
-    </form>
-    <p>Pas encore de compte ? <a href="register.php">S'inscrire</a></p>
+<link rel="stylesheet" href="/css/style.css">
+
+<!-- FONT SPORT -->
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+</head>
+
+<body class="auth-body">
+
+<div class="auth-container">
+
+    <div class="auth-left">
+        <h1>FOOTNOW</h1>
+        <p>Le meilleur site pour analyser les matchs et prédire les résultats de la Coupe du Monde.</p>
+    </div>
+
+    <div class="auth-form">
+
+        <h2>Connexion</h2>
+
+        <?php if ($error): ?>
+        <p class="error"><?php echo $error; ?></p>
+        <?php endif; ?>
+
+        <form method="POST">
+            <input type="email" name="email" placeholder="Email" required>
+            <input type="password" name="password" placeholder="Mot de passe" required>
+
+            <button>Se connecter</button>
+        </form>
+
+        <p>Pas encore de compte ? <a href="register.php">Créer un compte</a></p>
+
+    </div>
+
+</div>
+
 </body>
 </html>

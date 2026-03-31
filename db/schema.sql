@@ -2,6 +2,8 @@
 -- SAE BUT2 2026
 -- Création des tables PostgreSQL
 -- Projet prédiction Coupe du Monde 2026
+-- Auteur : Ahmed Fikri
+
 -- =====================================================
 
 

@@ -1,6 +1,7 @@
 -- SAE BUT2 2026
 -- Triggers PL/pgSQL - Automatisations
 -- Projet prediction Coupe du Monde 2026
+-- Auteur : Ahmed Fikri
 
 
 -- =====================================================

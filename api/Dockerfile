@@ -1,19 +1,16 @@
-FROM node:20-alpine
+FROM node:20-bookworm-slim
 
 WORKDIR /app
 
-# 1. Dépendances
+# OpenSSL for Prisma
+RUN apt-get update && apt-get install -y openssl ca-certificates libssl-dev && rm -rf /var/lib/apt/lists/*
+
 COPY package*.json ./
 RUN npm install
 
-# 2. Schéma Prisma (obligatoire avant generate)
 COPY prisma ./prisma
-
-# 3. Génération du client Prisma
 RUN npx prisma generate
 
-# 4. Code applicatif
 COPY . .
-
 EXPOSE 3070
 CMD ["npm", "run", "dev"]
