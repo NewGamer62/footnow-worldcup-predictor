@@ -42,8 +42,8 @@
 <!-- MENU USER (hidden) -->
 <div id="user-menu" class="user-menu">
   <p>👋 Bonjour <?php echo $_SESSION['user_email']; ?></p>
-  <a href="#">❤️ Favoris</a>
-  <a href="#">👤 Mon profil</a>
+  <a href="favorites.php">❤️ Favoris</a>
+  <a href="profile.php">👤 Mon profil</a>
   <a href="logout.php">🚪 Déconnexion</a>
 </div>
 
@@ -59,17 +59,17 @@
 </nav>
 
 <!-- COUNTDOWN -->
-<section class="countdown">
-  <div class="time-box"><span id="days">0</span><p>jours</p></div>
-  <div class="time-box"><span id="hours">0</span><p>heures</p></div>
-  <div class="time-box"><span id="minutes">0</span><p>minutes</p></div>
-  <div class="time-box"><span id="seconds">0</span><p>secondes</p></div>
-</section>
+<div class="countdown">
+  <div><span id="days">0</span><p>Jours</p></div>
+  <div><span id="hours">0</span><p>Heures</p></div>
+  <div><span id="minutes">0</span><p>Minutes</p></div>
+  <div><span id="seconds">0</span><p>Secondes</p></div>
+</div>
 
 <!-- CONTENT -->
 <section class="home-content">
 
-  <h1>Bienvenue sur FOOTNOW</h1>
+  <h1 class="glow-title">Bienvenue sur FOOTNOW</h1>
 
   <p>
     La plateforme ultime pour analyser les performances des équipes,
@@ -120,12 +120,31 @@
   <p>© 2026 FOOTNOW - Tous droits réservés</p>
 
   <div class="footer-links">
-    <a href="#">Politique de confidentialité</a>
-    <a href="#">Cookies</a>
-    <a href="#">Conditions d'utilisation</a>
+    <a href="privacy.php">Politique de confidentialité</a>
+    <a href="cookies.php">Cookies</a>
+    <a href="terms.php">Conditions d'utilisation</a>
   </div>
 
 </footer>
+
+<script>
+const targetDate = new Date("June 8, 2026 00:00:00").getTime();
+
+setInterval(() => {
+    const now = new Date().getTime();
+    const diff = targetDate - now;
+
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+    document.getElementById("days").innerText = days;
+    document.getElementById("hours").innerText = hours;
+    document.getElementById("minutes").innerText = minutes;
+    document.getElementById("seconds").innerText = seconds;
+}, 1000);
+</script>
 
 </body>
 </html>

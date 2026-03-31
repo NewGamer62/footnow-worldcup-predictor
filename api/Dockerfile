@@ -2,8 +2,8 @@ FROM node:20-bookworm-slim
 
 WORKDIR /app
 
-# OpenSSL for Prisma
-RUN apt-get update && apt-get install -y openssl ca-certificates libssl-dev && rm -rf /var/lib/apt/lists/*
+# OpenSSL for Prisma & Build tools for bcrypt
+RUN apt-get update && apt-get install -y openssl ca-certificates libssl-dev build-essential python3 && rm -rf /var/lib/apt/lists/*
 
 COPY package*.json ./
 RUN npm install

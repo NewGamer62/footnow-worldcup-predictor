@@ -3,7 +3,7 @@
 import { parse } from 'csv-parse/sync'
 import * as fs from 'fs'
 import * as path from 'path'
-import bcrypt from 'bcrypt'
+import bcrypt from 'bcryptjs'
 import { prisma } from '../src/client.js'
 import type { Prisma } from '@prisma/client'
 

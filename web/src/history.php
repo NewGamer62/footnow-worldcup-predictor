@@ -30,8 +30,8 @@ require_once "auth_check.php";
 
 <div id="user-menu" class="user-menu">
   <p>👋 Bonjour <?php echo $_SESSION['user_email']; ?></p>
-  <a href="#">❤️ Favoris</a>
-  <a href="#">👤 Mon profil</a>
+  <a href="favorites.php">❤️ Favoris</a>
+  <a href="profile.php">👤 Mon profil</a>
   <a href="logout.php">🚪 Déconnexion</a>
 </div>
 
@@ -45,7 +45,9 @@ require_once "auth_check.php";
   <a href="news.php">Actualité</a>
 </nav>
 
-<h1 class="ranking-title">HISTORIQUE DES MATCHS</h1>
+<section class="home-content">
+  <h1 class="glow-title">HISTORIQUE DES MATCHS</h1>
+</section>
 
 <div id="history" style="max-height: 70vh; overflow-y: scroll; padding: 20px;">
     <p>Chargement de l'historique (40k+ matchs)...</p>
@@ -57,9 +59,9 @@ require_once "auth_check.php";
   <p>© 2026 FOOTNOW - Tous droits réservés</p>
 
   <div class="footer-links">
-    <a href="#">Politique de confidentialité</a>
-    <a href="#">Cookies</a>
-    <a href="#">Conditions d'utilisation</a>
+    <a href="privacy.php">Politique de confidentialité</a>
+    <a href="cookies.php">Cookies</a>
+    <a href="terms.php">Conditions d'utilisation</a>
   </div>
 </footer>
 

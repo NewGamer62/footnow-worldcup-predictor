@@ -934,3 +934,35 @@ body {
 
   .proba-minibar { width: 100px; }
 }
+
+.page-title {
+    font-family: 'Bebas Neue', sans-serif;
+    color: #FFD700;
+    text-align: center;
+    margin-top: 100px;
+}
+
+.content {
+    width: 60%;
+    margin: auto;
+    color: rgb(0, 0, 0);
+    text-align: center;
+}
+
+/* GLOW TITLE */
+.glow-title {
+    font-family: 'Bebas Neue', sans-serif !important;
+    font-size: 70px !important;
+    color: #ffffff !important;
+    text-align: center !important;
+    margin: 40px 0 !important;
+    letter-spacing: 3px !important;
+    text-shadow: 
+        0 0 10px #ffd700,
+        0 0 20px #ffd700,
+        0 0 30px #ffd700,
+        0 0 40px #ffd700,
+        0 0 50px #ffd700,
+        0 0 60px #ff6b00 !important;
+    font-weight: bold !important;
+}

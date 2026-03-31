@@ -30,8 +30,8 @@
 
 <div id="user-menu" class="user-menu">
   <p>👋 Bonjour <?php echo $_SESSION['user_email']; ?></p>
-  <a href="#">❤️ Favoris</a>
-  <a href="#">👤 Mon profil</a>
+  <a href="favorites.php">❤️ Favoris</a>
+  <a href="profile.php">👤 Mon profil</a>
   <a href="logout.php">🚪 Déconnexion</a>
 </div>
 
@@ -45,7 +45,9 @@
   <a href="news.php">Actualité</a>
 </nav>
 
-<h1 class="ranking-title">CLASSEMENT MONDIAL FIFA</h1>
+<section class="home-content">
+  <h1 class="glow-title">CLASSEMENT MONDIAL FIFA</h1>
+</section>
 
 <div class="ranking-container">
     <p>Chargement du classement...</p>
@@ -57,9 +59,9 @@
   <p>© 2026 FOOTNOW - Tous droits réservés</p>
 
   <div class="footer-links">
-    <a href="#">Politique de confidentialité</a>
-    <a href="#">Cookies</a>
-    <a href="#">Conditions d'utilisation</a>
+    <a href="privacy.php">Politique de confidentialité</a>
+    <a href="cookies.php">Cookies</a>
+    <a href="terms.php">Conditions d'utilisation</a>
   </div>
 </footer>
 
