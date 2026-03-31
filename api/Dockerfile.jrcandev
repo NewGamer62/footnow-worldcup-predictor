@@ -1,40 +1,40 @@
 # I. BUILD
-FROM node:20-alpine AS builder
+FROM node:20-bookworm-slim AS builder
 
 WORKDIR /app
 
-# 1. Dépendances
+# 1. Dépendances + OpenSSL
 COPY package*.json ./
-RUN npm install
+RUN apt-get update && apt-get install -y openssl ca-certificates && npm install
 
-# 2. Schéma Prisma (obligatoire avant generate)
+# 2. Schéma Prisma
 COPY prisma ./prisma
 
-# 3. Génération du client Prisma
+# 3. Génération Prisma
 RUN npx prisma generate
 
 # 4. Code applicatif
 COPY tsconfig.json ./
 COPY src ./src
 
-# 5. Compilation des sources pour une version en production
+# 5. Build
 RUN npm run build
 
 # II. RUNTIME
-FROM node:20-alpine AS runtime
+FROM node:20-bookworm-slim AS runtime
 
 WORKDIR /app
 
-# 1. Dépendances
+# 1. Dépendances prod + OpenSSL
 COPY package*.json ./
-RUN npm install --omit=dev
+RUN apt-get update && apt-get install -y openssl ca-certificates && npm install --omit=dev
 
-# 2. Récupération des éléments prisma
+# 2. Prisma engines
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 COPY --from=builder /app/prisma ./prisma
 
-# 3. Récupération du Code applicatif compilé
+# 3. Dist
 COPY --from=builder /app/dist ./dist
 
 EXPOSE 3070

@@ -203,6 +203,8 @@ app.use('/api', async (req: Request, res: Response, next) => {
     normalizedPath === '/groupes' ||
     normalizedPath === '/favoris' ||
     normalizedPath === '/probabilites-2026' ||
+    normalizedPath === '/predictions' ||           // ← AJOUTÉ
+    normalizedPath === '/matchs-cdm2026' ||        // ← AJOUTÉ
     /^\/scores\/fifa\/[^/]+$/.test(normalizedPath) ||
     /^\/scores\/forme\/[^/]+$/.test(normalizedPath) ||
     /^\/scores\/h2h\/[^/]+\/[^/]+$/.test(normalizedPath)

@@ -1,8 +1,11 @@
+// Auteur : Ahmed Fikri
+
 import { parse } from 'csv-parse/sync'
-import fs from 'fs'
-import path from 'path'
+import * as fs from 'fs'
+import * as path from 'path'
 import bcrypt from 'bcrypt'
 import { prisma } from '../src/client.js'
+import type { Prisma } from '@prisma/client'
 
 async function main() {
   console.log('🚀 Début du seed Coupe du Monde 2026...')
@@ -18,17 +21,18 @@ async function main() {
   // -----------------------------
   // Nettoyage des tables 
   // -----------------------------
-  console.log('🧹 Nettoyage des tables existantes...')
-  await prisma.prediction.deleteMany()
-  await prisma.resultat.deleteMany()
-  await prisma.classementGroupe.deleteMany()
-  await prisma.matchCdm2026.deleteMany()
-  await prisma.matchHistorique.deleteMany()
-  await prisma.tokenApi.deleteMany()
-  await prisma.utilisateur.deleteMany()
-  await prisma.groupe.deleteMany()
-  await prisma.equipe.deleteMany()
-  console.log('✅ Nettoyage terminé')
+console.log('🧹 Nettoyage des tables existantes...')
+  // Skip delete if tables empty (seed safe)
+  try { await prisma.prediction.deleteMany() } catch (e) { console.log('prediction skip') }
+  try { await prisma.resultat.deleteMany() } catch (e) { console.log('resultat skip') }
+  try { await prisma.classementGroupe.deleteMany() } catch (e) { console.log('classement skip') }
+  try { await prisma.matchCdm2026.deleteMany() } catch (e) { console.log('matchCdm skip') }
+  try { await prisma.matchHistorique.deleteMany() } catch (e) { console.log('historique skip') }
+  try { await prisma.tokenApi.deleteMany() } catch (e) { console.log('token skip') }
+  try { await prisma.utilisateur.deleteMany() } catch (e) { console.log('user skip') }
+  try { await prisma.groupe.deleteMany() } catch (e) { console.log('groupe skip') }
+  try { await prisma.equipe.deleteMany() } catch (e) { console.log('equipe skip') }
+  console.log('✅ Nettoyage terminé (tables vides skip OK)')
 
   // ========================
   // 1. ÉQUIPES + CLASSEMENT FIFA

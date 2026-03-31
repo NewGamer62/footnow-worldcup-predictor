@@ -1,6 +1,7 @@
 -- SAE BUT2 2026
 -- Fonctions PL/pgSQL - Calcul des predictions
 -- Projet prediction Coupe du Monde 2026
+-- Auteur : Ahmed Fikri
 
 
 -- =====================================================

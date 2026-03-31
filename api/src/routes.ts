@@ -43,23 +43,58 @@ router.get('/equipes', async (_req: Request, res: Response) => {
  * GET /api/matchs-historique
  * Retourne les derniers matchs historiques
  */
-router.get('/matchs-historique', async (_req: Request, res: Response) => {
+router.get('/matchs-historique', async (req: Request, res: Response) => {
   try {
-    const matchs = await prisma.matchHistorique.findMany({
-      orderBy: [
-        { date_match: 'desc' },
-        { id_match: 'desc' }
-      ],
-      take: 50,
-      select: {
-        date_match: true,
-        equipe1: true,
-        equipe2: true,
-        score1: true,
-        score2: true,
-        tournoi: true,
-        pays: true
-      }
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 50;
+    const skip = (page - 1) * limit;
+
+    const [matchs, total] = await prisma.$transaction([
+      prisma.matchHistorique.findMany({
+        orderBy: [
+          { date_match: 'desc' },
+          { id_match: 'desc' }
+        ],
+        skip,
+        take: limit,
+        select: {
+          date_match: true,
+          equipe1: true,
+          equipe2: true,
+          score1: true,
+          score2: true,
+          tournoi: true,
+          pays: true
+        }
+      }),
+      prisma.matchHistorique.count()
+    ]);
+
+    res.json({
+      page,
+      limit,
+      total,
+      pages: Math.ceil(total / limit),
+      matchs
+    })
+  } catch (error) {
+    console.error('Erreur matchs historiques:', error)
+    res.status(500).json({ error: 'Erreur serveur' })
+  }
+})
+
+/**
+ * GET /api/matchs-cdm2026
+ * Tous les matchs CDM 2026
+ */
+router.get('/matchs-cdm2026', async (req: Request, res: Response) => {
+  try {
+    const matchs = await prisma.matchCdm2026.findMany({
+      include: {
+        groupe: true,
+        predictions: true
+      },
+      orderBy: { numero: 'asc' }
     })
 
     res.json({
@@ -67,11 +102,8 @@ router.get('/matchs-historique', async (_req: Request, res: Response) => {
       matchs
     })
   } catch (error) {
-    console.error('Erreur lors de la récupération des matchs historiques:', error)
-    res.status(500).json({
-      error: 'Erreur lors de la récupération des matchs historiques',
-      details: error instanceof Error ? error.message : 'Erreur inconnue'
-    })
+    console.error('Erreur matchs CDM:', error)
+    res.status(500).json({ error: 'Erreur serveur' })
   }
 })
 

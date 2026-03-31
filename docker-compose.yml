@@ -11,6 +11,11 @@ services:
       - "5432:5432"
     networks:
       - lan
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sae_user -d sae_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   api:
     container_name: ${NAME}_api
@@ -26,7 +31,8 @@ services:
     ports:
       - "3070:3070"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     networks:
       - lan
       - web

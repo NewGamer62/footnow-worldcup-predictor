@@ -47,8 +47,8 @@ require_once "auth_check.php";
 
 <h1 class="ranking-title">HISTORIQUE DES MATCHS</h1>
 
-<div id="history">
-    <p>Chargement de l'historique...</p>
+<div id="history" style="max-height: 70vh; overflow-y: scroll; padding: 20px;">
+    <p>Chargement de l'historique (40k+ matchs)...</p>
 </div>
 
 <script src="/js/app.js"></script>

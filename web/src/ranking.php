@@ -28,6 +28,13 @@
   <div class="user-icon" onclick="toggleMenu()">⚽</div>
 </header>
 
+<div id="user-menu" class="user-menu">
+  <p>👋 Bonjour <?php echo $_SESSION['user_email']; ?></p>
+  <a href="#">❤️ Favoris</a>
+  <a href="#">👤 Mon profil</a>
+  <a href="logout.php">🚪 Déconnexion</a>
+</div>
+
 <nav class="main-menu">
   <a href="index.php">Accueil</a>
   <a href="ranking.php">Classement équipes</a>

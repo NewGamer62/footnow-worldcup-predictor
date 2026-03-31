@@ -19,7 +19,6 @@ document.addEventListener("click", function(event) {
   }
 });
 
-
 // ===== COUNTDOWN =====
 const targetDate = new Date("June 11, 2026 00:00:00").getTime();
 
@@ -104,14 +103,13 @@ const COUNTRY_CODE_MAP = {
     "uruguay": "uy",
     "switzerland": "ch",
     "japan": "jp",
-    "ir iran": "ir",
+    "iran": "ir",
     "denmark": "dk",
     "korea republic": "kr",
     "ecuador": "ec",
     "austria": "at",
     "turkey": "tr",
     "czech republic": "cz",
-    "czechia": "cz",
     "nigeria": "ng",
     "australia": "au",
     "algeria": "dz",
@@ -137,13 +135,10 @@ const COUNTRY_CODE_MAP = {
     "bolivia": "bo",
     "haiti": "ht",
     "new zealand": "nz",
-    "iran": "ir",
     "paraguay": "py",
     "scotland": "gb-sct",
-    "cabo verde": "cv",
     "cape verde": "cv",
     "ivory coast": "ci",
-    "cote d'ivoire": "ci",
     "curacao": "cw",
     "south korea": "kr",
     "to be announced": "un",
@@ -194,28 +189,24 @@ async function callAPI(endpoint) {
     }
 }
 
-// Charger et afficher le classement des équipes
+// Charger et afficher le classement des équipes (sans fallback)
 async function loadRanking() {
     const container = document.querySelector(".ranking-container");
     if (!container) return;
 
     const data = await callAPI('/api/equipes');
-    const fallbackRanking = [
-        { nom: 'Argentina', classement: 1, points_fifa: 1858.0 },
-        { nom: 'France', classement: 2, points_fifa: 1840.6 },
-        { nom: 'Brazil', classement: 3, points_fifa: 1837.9 },
-        { nom: 'England', classement: 4, points_fifa: 1794.9 },
-        { nom: 'Belgium', classement: 5, points_fifa: 1789.0 }
-    ];
-
-    const equipes = data && data.equipes ? data.equipes : fallbackRanking;
-
-    if (!data || !data.equipes) {
-        container.innerHTML = "<p>API indisponible: affichage d'un classement local.</p>";
-    }
-
-    if (equipes.length === 0) {
-        container.innerHTML = "<p>Aucune équipe trouvée. Veuillez exécuter le seed de la base de données avec : docker compose exec api npx prisma db seed</p>";
+    
+    // ❌ PLUS DE FALLBACK - On affiche une erreur si API indisponible
+    if (!data || !data.equipes || data.equipes.length === 0) {
+        container.innerHTML = `
+            <p style="color:red; text-align:center; padding:20px;">
+                ❌ API indisponible ou base de données vide.<br>
+                Vérifiez que Docker est lancé et que le seed a été exécuté.
+            </p>
+            <p style="color:white; text-align:center;">
+                Commande: docker compose exec api npx prisma db seed
+            </p>
+        `;
         return;
     }
 
@@ -228,7 +219,7 @@ async function loadRanking() {
         </div>
     `;
     let rank = 1;
-    equipes.forEach(team => {
+    data.equipes.forEach(team => {
         const rankAPI = team.classement || rank;
         const pointsValue = Number(team.points_fifa);
         const points = Number.isFinite(pointsValue) ? pointsValue.toFixed(1) : 'N/A';
@@ -250,98 +241,128 @@ async function loadRanking() {
     updateFavoritesUI();
 }
 
-// Charger et afficher l'historique des matchs
-async function loadHistory() {
+// Charger et afficher l'historique des matchs (sans fallback)
+let historyPage = 1;
+let historyLoading = false;
+let historyTotalPages = 0;
+let historyAllLoaded = false;
+
+async function loadHistory(page = 1, append = false) {
+    if (historyLoading) return;
+    historyLoading = true;
+
     const container = document.getElementById("history");
     if (!container) return;
 
-    const data = await callAPI('/api/matchs-historique');
-    if (!data || !data.matchs) {
-        // Fallback vers données statiques si l'API n'est pas disponible
-        const historyData = [
-            { date_match: "2022-12-18", equipe1: "Argentina", equipe2: "France", score1: 3, score2: 3 },
-            { date_match: "2022-12-17", equipe1: "Morocco", equipe2: "Croatia", score1: 1, score2: 2 }
-        ];
-
-        let html = "<h2 class='ranking-title'>📊 Historique des Matchs</h2><div class='history-list'>";
-        historyData.forEach(match => {
-            html += `
-                <div class="history-item">
-                    <span class="date">${match.date_match}</span>
-                    <span class="teams">
-                        <span class="history-team">${getTeamFlagTag(match.equipe1, "history-flag")}${match.equipe1}</span>
-                        <strong>${match.score1} - ${match.score2}</strong>
-                        <span class="history-team">${getTeamFlagTag(match.equipe2, "history-flag")}${match.equipe2}</span>
-                    </span>
-                </div>
-            `;
-        });
-        html += "</div>";
-        container.innerHTML = html;
+    const data = await callAPI(`/api/matchs-historique?page=${page}&limit=50`);
+    
+    if (!data || !data.matchs || data.matchs.length === 0) {
+        historyAllLoaded = true;
+        historyLoading = false;
         return;
     }
 
-    const cleanMatches = data.matchs.filter(match => {
-        const team1 = normalizeTeamName(match.equipe1);
-        const team2 = normalizeTeamName(match.equipe2);
-        return team1 && team2 && team1 !== "na" && team2 !== "na";
-    });
+    historyTotalPages = data.pages || 0;
 
-    let html = "<h2 class='ranking-title'>📊 Historique des Matchs</h2><div class='history-list'>";
-    cleanMatches.forEach(match => {
+    let html = '';
+    data.matchs.forEach(match => {
+        const dateStr = new Date(match.date_match).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
         html += `
             <div class="history-item">
-                <span class="date">${match.date_match || 'N/A'}</span>
+                <span class="date">${dateStr}</span>
                 <span class="teams">
-                    <span class="history-team">${getTeamFlagTag(match.equipe1 || 'Team1', "history-flag")}${match.equipe1 || 'Team1'}</span>
+                    <span class="history-team">${getTeamFlagTag(match.equipe1, "history-flag") || match.equipe1 || 'NA'}${match.equipe1 || 'NA'}</span>
                     <strong>${match.score1 || 0} - ${match.score2 || 0}</strong>
-                    <span class="history-team">${getTeamFlagTag(match.equipe2 || 'Team2', "history-flag")}${match.equipe2 || 'Team2'}</span>
+                    <span class="history-team">${getTeamFlagTag(match.equipe2, "history-flag") || match.equipe2 || 'NA'}${match.equipe2 || 'NA'}</span>
                 </span>
+                <span class="tournoi">${match.tournoi || ''}</span>
             </div>
         `;
     });
-    html += "</div>";
-    container.innerHTML = html;
+
+    if (append) {
+        container.querySelector('.history-list').innerHTML += html;
+    } else {
+        container.innerHTML = `<h2 class='ranking-title'>📊 Historique des Matchs (40k+ matchs)</h2><div class='history-list'>${html}</div>`;
+    }
+
+    historyPage = page;
+    historyLoading = false;
 }
 
-// Charger et afficher les groupes
+function onHistoryScroll() {
+    const container = document.getElementById("history");
+    if (!container || historyAllLoaded || historyLoading) return;
+
+    if (container.scrollTop + container.clientHeight >= container.scrollHeight - 100) {
+        if (historyPage < historyTotalPages) {
+            loadHistory(historyPage + 1, true);
+        }
+    }
+}
+
+// Initial load
+document.addEventListener("DOMContentLoaded", function() {
+    if (document.getElementById("history")) {
+        loadHistory(1);
+        document.getElementById("history").addEventListener('scroll', onHistoryScroll);
+    }
+});
+
+// Charger et afficher les groupes (sans fallback)
 async function loadGroups() {
     const container = document.querySelector(".groups-container");
     if (!container) return;
 
     const data = await callAPI('/api/groupes');
-    if (!data || !data.groupes) {
-        // Fallback vers données statiques si l'API n'est pas disponible
-        const groupsData = {
-            "Group A": ["Mexico", "South Africa", "South Korea", "TBD"],
-            "Group B": ["Canada", "TBD", "Qatar", "Switzerland"],
-            "Group C": ["Brazil", "Morocco", "Haiti", "Scotland"],
-            "Group D": ["USA", "Paraguay", "Australia", "TBD"],
-            "Group E": ["Germany", "Curaçao", "Ivory Coast", "Ecuador"],
-            "Group F": ["Netherlands", "Japan", "TBD", "Tunisia"],
-            "Group G": ["Belgium", "Egypt", "Iran", "New Zealand"],
-            "Group H": ["Spain", "Cape Verde", "Saudi Arabia", "Uruguay"],
-            "Group I": ["France", "Senegal", "TBD", "Norway"],
-            "Group J": ["Argentina", "Algeria", "Austria", "Jordan"],
-            "Group K": ["Portugal", "TBD", "Uzbekistan", "Colombia"],
-            "Group L": ["England", "Croatia", "Ghana", "Panama"]
-        };
-
-        let html = "";
-        Object.entries(groupsData).forEach(([groupName, teams]) => {
-            html += `<div class="group"><h3>${groupName}</h3><ul>`;
-            teams.forEach(team => {
-                html += `<li>${getTeamFlagTag(team)}<span>${team}</span></li>`;
-            });
-            html += "</ul></div>";
-        });
-        container.innerHTML = html;
+    
+    if (!data || !data.groupes || data.groupes.length === 0) {
+        container.innerHTML = `
+            <p style="color:red; text-align:center; padding:20px;">
+                ❌ Aucun groupe trouvé.<br>
+                Vérifiez que le fichier fifa-world-cup-2026-UTC.csv a bien été importé.
+            </p>
+        `;
         return;
     }
 
-    // TODO: Implémenter l'affichage des groupes depuis l'API
-    // Pour l'instant, afficher un message
-    container.innerHTML = "<p>Données des groupes en cours d'implémentation dans l'API</p>";
+    // Récupérer les matchs pour connaître les équipes de chaque groupe
+    const matchsData = await callAPI('/api/matchs-cdm2026');
+    const groupesMap = {};
+    
+    if (matchsData && matchsData.matchs) {
+        matchsData.matchs.forEach(match => {
+            if (match.id_groupe) {
+                if (!groupesMap[match.id_groupe]) {
+                    groupesMap[match.id_groupe] = {
+                        nom: match.groupe?.nom || `Groupe ${match.id_groupe}`,
+                        equipes: new Set()
+                    };
+                }
+                if (match.equipe_dom && match.equipe_dom !== 'To be announced') {
+                    groupesMap[match.id_groupe].equipes.add(match.equipe_dom);
+                }
+                if (match.equipe_ext && match.equipe_ext !== 'To be announced') {
+                    groupesMap[match.id_groupe].equipes.add(match.equipe_ext);
+                }
+            }
+        });
+    }
+
+    let html = "";
+    data.groupes.forEach(g => {
+        const equipes = groupesMap[g.id_groupe]?.equipes || [];
+        html += `<div class="group"><h3>${g.nom}</h3><ul>`;
+        if (equipes.size > 0) {
+            equipes.forEach(team => {
+                html += `<li>${getTeamFlagTag(team)}<span>${team}</span></li>`;
+            });
+        } else {
+            html += `<li>Équipes à déterminer</li>`;
+        }
+        html += "</ul></div>";
+    });
+    container.innerHTML = html;
 }
 
 // Charger et afficher les prédictions
@@ -363,7 +384,7 @@ async function loadPredictions() {
 
             html += `
                 <div class="prediction-card">
-                    <h3>${team}</h3>
+                    <h3>${getTeamFlagTag(team)} ${team}</h3>
                     <div class="scores">
                         <p>Score FIFA: ${fifaData ? (fifaData.score_fifa * 100).toFixed(1) + '%' : 'N/A'}</p>
                         <p>Forme récente: ${formeData ? (formeData.forme_recente * 100).toFixed(1) + '%' : 'N/A'}</p>
@@ -373,7 +394,7 @@ async function loadPredictions() {
         } catch (error) {
             html += `
                 <div class="prediction-card">
-                    <h3>${team}</h3>
+                    <h3>${getTeamFlagTag(team)} ${team}</h3>
                     <p>Erreur lors du chargement des données</p>
                 </div>
             `;
@@ -391,21 +412,24 @@ async function loadTeamDetails(teamName) {
     container.innerHTML = `<h3>Matchs de ${teamName}</h3><p>Fonctionnalité à implémenter</p>`;
 }
 
+// Charger les probabilités de la CDM 2026 (sans fallback)
 async function loadWorldCupProbabilities() {
     const container = document.getElementById("probabilities-container");
     if (!container) return;
 
     const data = await callAPI('/api/probabilites-2026');
-    const fallback = [
-        { classement: 1, equipe: 'Argentina', probabilite_titulo: 31.2 },
-        { classement: 2, equipe: 'France', probabilite_titulo: 29.5 },
-        { classement: 3, equipe: 'Brazil', probabilite_titulo: 24.8 },
-        { classement: 4, equipe: 'Spain', probabilite_titulo: 21.6 },
-        { classement: 5, equipe: 'England', probabilite_titulo: 20.1 },
-        { classement: 6, equipe: 'Morocco', probabilite_titulo: 14.0 }
-    ];
+    
+    if (!data || !data.favoris || data.favoris.length === 0) {
+        container.innerHTML = `
+            <p class="proba-intro" style="color:red; text-align:center;">
+                ❌ Impossible de charger les probabilités.<br>
+                Vérifiez que l'API est accessible.
+            </p>
+        `;
+        return;
+    }
 
-    const teams = data && data.favoris ? data.favoris : fallback;
+    const teams = data.favoris;
 
     let html = `<p class='proba-intro'>Projection des favoris de la Coupe du Monde 2026 selon les statistiques disponibles (forme, classement FIFA et historique).</p><div class='proba-grid'>`;
     teams.forEach((team, index) => {
