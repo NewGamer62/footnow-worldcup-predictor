@@ -295,11 +295,10 @@ body {
 
 /* FOOTER */
 .footer {
-  margin-top: auto;
-  padding: 30px;
-  text-align: center;
-  background: rgba(7, 12, 24, 0.82);
-  color: #eef4ff;
+    background: transparent;
+    padding: 20px;
+    text-align: center;
+    color: white;
 }
 
 .footer-links { margin-top: 10px; }
