@@ -230,7 +230,7 @@ router.get('/probabilites-2026', async (_req: Request, res: Response) => {
 
 /**
  * GET /api/scores/fifa/:equipe
- * Obtient le score FIFA normalisé (0-1) pour une équipe
+ * Obtient le score FIFA normalisé(0-1) pour une équipe
  */
 router.get('/scores/fifa/:equipe', async (req: Request, res: Response) => {
   try {
