@@ -433,13 +433,13 @@ async function loadWorldCupProbabilities() {
 
     let html = `<p class='proba-intro'>Projection des favoris de la Coupe du Monde 2026 selon les statistiques disponibles (forme, classement FIFA et historique).</p><div class='proba-grid'>`;
     teams.forEach((team, index) => {
-        const ranking = team.classement || index + 1;
+        const ranking = index + 1;
         const probability = Number(team.probabilite_titulo) || 0;
         const barWidth = Math.max(0, Math.min(100, probability));
 
         html += `
             <div class='proba-card'>
-                <div class='proba-rank'>${ranking}</div>
+                <div class='proba-rank'>${index + 1}</div>
                 <div class='proba-team'>${getTeamFlagTag(team.equipe, "team-flag")}${team.equipe}</div>
                 <div class='proba-bar'><div class='proba-fill' style='width:${barWidth}%'></div></div>
                 <div class='proba-value'>${probability.toFixed(1)}%</div>
