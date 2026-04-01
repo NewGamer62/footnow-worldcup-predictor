@@ -23,6 +23,8 @@ services:
     restart: unless-stopped
     env_file:
       - .env
+    environment:
+      DATABASE_URL: ${DATABASE_URL}    # ← AJOUTER CETTE LIGNE
     volumes:
       - ./db:/db
       - ./db/data:/data

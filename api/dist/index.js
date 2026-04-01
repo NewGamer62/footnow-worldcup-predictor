@@ -1,7 +1,7 @@
 import express from 'express';
 import crypto from 'node:crypto';
-import bcrypt from 'bcrypt';
-import { prisma } from './client.js';
+import bcrypt from 'bcryptjs';
+import { prisma } from './client';
 import router from './routes.js';
 const SALT_ROUNDS = 10;
 const app = express();
@@ -174,6 +174,8 @@ app.use('/api', async (req, res, next) => {
         normalizedPath === '/groupes' ||
         normalizedPath === '/favoris' ||
         normalizedPath === '/probabilites-2026' ||
+        normalizedPath === '/predictions' || // ← AJOUTÉ
+        normalizedPath === '/matchs-cdm2026' || // ← AJOUTÉ
         /^\/scores\/fifa\/[^/]+$/.test(normalizedPath) ||
         /^\/scores\/forme\/[^/]+$/.test(normalizedPath) ||
         /^\/scores\/h2h\/[^/]+\/[^/]+$/.test(normalizedPath);
