@@ -335,8 +335,8 @@ body {
 
 /* BODY */
 body {
-  margin: 0;
   min-height: 100vh;
+  margin: 0;
   display: flex;
   flex-direction: column;
   cursor: url("/assets/images/cursor.cur") 16 16, auto;
@@ -1644,4 +1644,112 @@ body {
   .data-form-grid {
     grid-template-columns: 1fr;
   }
+}
+
+/* ================= FIX GLOBAL LAYOUT ================= */
+
+/* Empêche les bugs de hauteur et scroll */
+html, body {
+  height: auto !important;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Structure propre de page */
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Empêche les sections de bloquer la page */
+main, .ranking-container, .groups-container, 
+.predictions-container, .proba-container, 
+#history {
+  flex: 1;
+}
+
+/* ================= FIX CLASSEMENT ================= */
+
+/* PROBLÈME PRINCIPAL = ICI */
+.ranking-container {
+  width: min(1200px, 95%) !important;
+  margin: 40px auto !important;
+
+  /* ❌ ON SUPPRIME LE SCROLL INTERNE */
+  max-height: none !important;
+  overflow: visible !important;
+
+  padding: 0 10px 20px;
+}
+
+/* Cartes plus lisibles */
+.ranking-header,
+.ranking-card {
+  grid-template-columns: 80px 2fr 160px 100px !important;
+}
+
+/* ================= FIX TABLE / LARGEUR ================= */
+
+table {
+  width: 100% !important;
+}
+
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+}
+
+/* ================= FIX TITRES ================= */
+
+.section-title,
+.glow-title,
+.ranking-title,
+.groups-title,
+.predictions-title {
+  font-size: 64px !important;
+  margin: 40px 0 !important;
+  text-align: center;
+}
+
+/* ================= FIX FOOTER ================= */
+
+.footer {
+  margin-top: auto;
+}
+
+/* ================= FIX GLOBAL CONTAINERS ================= */
+
+.content-section,
+.cards,
+.features,
+.matches-preview,
+.prediction-container,
+.proba-container,
+.predictions-page,
+.data-manager-container {
+  width: min(1200px, 95%) !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* ================= FIX MOBILE ================= */
+
+@media (max-width: 768px) {
+
+  .ranking-header,
+  .ranking-card {
+    grid-template-columns: 50px 1fr 100px 60px !important;
+  }
+
+  .section-title,
+  .glow-title {
+    font-size: 36px !important;
+  }
+
+}
+/* FIX FORCÉ TITRE (TOUTES LES PAGES) */
+.glow-title {
+  font-size: 42px !important;
+  margin: 20px 0 !important;
+  line-height: 1.2 !important;
 }

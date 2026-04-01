@@ -105,28 +105,49 @@ document.addEventListener("click", function(event) {
   }
 });
 
-// ===== COUNTDOWN =====
-const targetDate = new Date("June 11, 2026 00:00:00").getTime();
+// ===== COUNTDOWN CLEAN =====
+const targetDate = new Date(2026, 5, 8, 0, 0, 0).getTime();
 
-setInterval(() => {
+function updateCountdown() {
+
     const daysEl = document.getElementById("days");
     const hoursEl = document.getElementById("hours");
     const minutesEl = document.getElementById("minutes");
     const secondsEl = document.getElementById("seconds");
 
-    if (!daysEl || !hoursEl || !minutesEl || !secondsEl) {
+    if (!daysEl) return;
+
+    let diff = targetDate - Date.now();
+
+    if (diff <= 0) {
+        daysEl.textContent = "0";
+        hoursEl.textContent = "0";
+        minutesEl.textContent = "0";
+        secondsEl.textContent = "0";
         return;
     }
 
-  const now = new Date().getTime();
-  const diff = targetDate - now;
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    diff -= days * (1000 * 60 * 60 * 24);
 
-    daysEl.innerText = Math.floor(diff / (1000 * 60 * 60 * 24));
-    hoursEl.innerText = Math.floor((diff / (1000 * 60 * 60)) % 24);
-    minutesEl.innerText = Math.floor((diff / (1000 * 60)) % 60);
-    secondsEl.innerText = Math.floor((diff / 1000) % 60);
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    diff -= hours * (1000 * 60 * 60);
 
-}, 1000);
+    const minutes = Math.floor(diff / (1000 * 60));
+    diff -= minutes * (1000 * 60);
+
+    const seconds = Math.floor(diff / 1000);
+
+    daysEl.textContent = days;
+    hoursEl.textContent = hours;
+    minutesEl.textContent = minutes;
+    secondsEl.textContent = seconds;
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+});
 
 function toggleFavorite(team) {
     let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
