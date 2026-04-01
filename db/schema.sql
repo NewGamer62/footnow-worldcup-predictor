@@ -79,7 +79,7 @@ CREATE TABLE match_cdm2026 (
 
 CREATE TABLE resultat (
     id_resultat     SERIAL PRIMARY KEY,
-    id_match_wc     INT REFERENCES match_cdm2026(id_match_wc),
+    id_match_wc     INT UNIQUE REFERENCES match_cdm2026(id_match_wc),
     score_dom       INT CHECK (score_dom >= 0),
     score_ext       INT CHECK (score_ext >= 0),
     date_saisie     TIMESTAMP DEFAULT NOW()
@@ -118,7 +118,7 @@ CREATE TABLE token_api (
 
 CREATE TABLE prediction (
     id_prediction   SERIAL PRIMARY KEY,
-    id_match_wc     INT REFERENCES match_cdm2026(id_match_wc),
+    id_match_wc     INT UNIQUE REFERENCES match_cdm2026(id_match_wc),
     proba_dom       NUMERIC(5,2),   -- probabilité victoire équipe domicile
     proba_nul       NUMERIC(5,2),   -- probabilité match nul
     proba_ext       NUMERIC(5,2),   -- probabilité victoire équipe extérieur
@@ -128,6 +128,25 @@ CREATE TABLE prediction (
         proba_nul >= 0 AND proba_nul <= 100 AND
         proba_ext >= 0 AND proba_ext <= 100
     )
+);
+
+
+-- =========================
+-- TABLE CLASSEMENT GROUPE
+-- =========================
+
+CREATE TABLE classement_groupe (
+    id_classement    SERIAL PRIMARY KEY,
+    id_groupe        INT NOT NULL REFERENCES groupe(id_groupe),
+    equipe           VARCHAR(100) NOT NULL,
+    points           INT DEFAULT 0,
+    buts_pour        INT DEFAULT 0,
+    buts_contre      INT DEFAULT 0,
+    matchs_joues     INT DEFAULT 0,
+    victoires        INT DEFAULT 0,
+    nuls             INT DEFAULT 0,
+    defaites         INT DEFAULT 0,
+    CONSTRAINT uq_classement_groupe UNIQUE (id_groupe, equipe)
 );
 
 

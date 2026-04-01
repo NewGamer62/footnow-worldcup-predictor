@@ -6,7 +6,10 @@ services:
     env_file:
       - .env
     volumes:
-      - postgres_data:/var/lib/postgresql
+      - postgres_data:/var/lib/postgresql/data
+      - ./db/schema.sql:/docker-entrypoint-initdb.d/01_schema.sql:ro
+      - ./db/functions.sql:/docker-entrypoint-initdb.d/02_functions.sql:ro
+      - ./db/triggers.sql:/docker-entrypoint-initdb.d/03_triggers.sql:ro
     ports:
       - "5432:5432"
     networks:
@@ -21,6 +24,7 @@ services:
     container_name: ${NAME}_api
     build: ./api
     restart: unless-stopped
+    command: sh -c "npx prisma db seed && npm run dev"
     env_file:
       - .env
     volumes:

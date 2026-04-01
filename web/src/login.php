@@ -14,6 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     ) {
         $_SESSION['user_token'] = "fake_token";
         $_SESSION['user_email'] = $email;
+        $_SESSION['user_created_at'] = $_SESSION['registered_created_at'] ?? date('c');
 
         header("Location: index.php");
         exit();
@@ -27,6 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Connexion</title>
 
 <link rel="stylesheet" href="/css/style.css">
@@ -67,3 +69,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 </body>
 </html>
+
+

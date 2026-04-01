@@ -4,6 +4,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FOOTNOW</title>
 
 <link rel="stylesheet" href="/css/style.css">
@@ -33,18 +34,16 @@
   </div>
 
   <!-- USER ICON -->
-  <div class="user-icon" onclick="toggleMenu()">
-    ⚽
-  </div>
+  <div class="user-icon" onclick="toggleMenu()" aria-label="Menu utilisateur"></div>
 
 </header>
 
 <!-- MENU USER (hidden) -->
 <div id="user-menu" class="user-menu">
-  <p>👋 Bonjour <?php echo $_SESSION['user_email']; ?></p>
-  <a href="favorites.php">❤️ Favoris</a>
-  <a href="profile.php">👤 Mon profil</a>
-  <a href="logout.php">🚪 Déconnexion</a>
+  <p>Bonjour <?php echo $_SESSION['user_email']; ?></p>
+  <a href="favorites.php">Favoris</a>
+  <a href="profile.php">Mon profil</a>
+  <a href="logout.php">Deconnexion</a>
 </div>
 
 <!-- MENU -->
@@ -60,10 +59,10 @@
 
 <!-- COUNTDOWN -->
 <div class="countdown">
-  <div><span id="days">0</span><p>Jours</p></div>
-  <div><span id="hours">0</span><p>Heures</p></div>
-  <div><span id="minutes">0</span><p>Minutes</p></div>
-  <div><span id="seconds">0</span><p>Secondes</p></div>
+  <div class="time-box"><span id="days">0</span><p>Jours</p></div>
+  <div class="time-box"><span id="hours">0</span><p>Heures</p></div>
+  <div class="time-box"><span id="minutes">0</span><p>Minutes</p></div>
+  <div class="time-box"><span id="seconds">0</span><p>Secondes</p></div>
 </div>
 
 <!-- CONTENT -->
@@ -98,15 +97,18 @@
   <div class="features">
 
     <div class="feature">
-      📊 Analyse des équipes
+      <h3>Analyse des équipes</h3>
+      <p>Compare classement FIFA, forme récente et dynamique de tournoi</p>
     </div>
 
     <div class="feature">
-      ⚽ Données historiques
+      <h3>Données historiques</h3>
+      <p>Exploitation des résultats passés pour révéler les tendances</p>
     </div>
 
     <div class="feature">
-      🔮 Prédictions intelligentes
+      <h3>Prédictions intelligentes</h3>
+      <p>Prédictions grâce aux probabilités</p>
     </div>
 
   </div>
@@ -123,6 +125,7 @@
     <a href="privacy.php">Politique de confidentialité</a>
     <a href="cookies.php">Cookies</a>
     <a href="terms.php">Conditions d'utilisation</a>
+    <a href="data-manager.php">Gerer les donnees</a>
   </div>
 
 </footer>
@@ -148,3 +151,5 @@ setInterval(() => {
 
 </body>
 </html>
+
+

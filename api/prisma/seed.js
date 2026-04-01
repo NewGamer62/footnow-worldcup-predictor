@@ -4,18 +4,18 @@ import * as path from 'path';
 import bcrypt from 'bcrypt';
 import { prisma } from '../src/client.js';
 async function main() {
-    console.log('🚀 Début du seed Coupe du Monde 2026...');
+    console.log('Démarrage du seed...');
     // Détection du répertoire de données 
     const candidateDirs = [
         '/data', // dans le conteneur Docker (monté par compose)
         path.join(process.cwd(), '../db/data'), // local : depuis api/ => ../db/data
     ];
     const dataDir = candidateDirs.find(d => fs.existsSync(d)) ?? candidateDirs[1];
-    console.log(`📁 Répertoire de données : ${dataDir}`);
+    console.log(`Répertoire de données : ${dataDir}`);
     // -----------------------------
     // Nettoyage des tables 
     // -----------------------------
-    console.log('🧹 Nettoyage des tables existantes...');
+    console.log('Nettoyage des tables existantes...');
     // Skip delete if tables empty (seed safe)
     try {
         await prisma.prediction.deleteMany();
@@ -71,7 +71,7 @@ async function main() {
     catch (e) {
         console.log('equipe skip');
     }
-    console.log('✅ Nettoyage terminé (tables vides skip OK)');
+    console.log('Nettoyage terminé');
     // ========================
     // 1. ÉQUIPES + CLASSEMENT FIFA
     // ========================
@@ -91,7 +91,7 @@ async function main() {
             },
         });
     }
-    console.log(`✅ ${rankingData.length} équipes + classement FIFA importés`);
+    console.log(`${rankingData.length} équipes + classement FIFA importés`);
     // ========================
     // 2. MATCHS HISTORIQUES
     // ========================
@@ -117,7 +117,7 @@ async function main() {
         });
         historyCount++;
     }
-    console.log(`✅ ${historyCount} matchs historiques importés`);
+    console.log(`${historyCount} matchs historiques importés`);
     // ========================
     // 3. MATCHS CDM 2026 & GROUPES
     // ========================
@@ -137,7 +137,7 @@ async function main() {
             create: { nom: groupName },
         });
     }
-    console.log(`✅ ${groupNames.length} groupes créés`);
+    console.log(`${groupNames.length} groupes créés`);
     const groupes = await prisma.groupe.findMany();
     const groupMap = new Map(groupes.map(g => [g.nom.toLowerCase().trim(), g.id_groupe]));
     let wcCount = 0;
@@ -155,7 +155,7 @@ async function main() {
         });
         wcCount++;
     }
-    console.log(`✅ ${wcCount} matchs Coupe du Monde 2026 importés`);
+    console.log(`${wcCount} matchs Coupe du Monde 2026 importés`);
     // ========================
     // 4. FONCTIONS PL/pgSQL
     // ========================
@@ -165,7 +165,7 @@ async function main() {
         throw new Error(`Fichier SQL non trouvé : ${functionsPath}`);
     const functionsSql = fs.readFileSync(functionsPath, 'utf8');
     await prisma.$executeRawUnsafe(functionsSql);
-    console.log('✅ Fonctions PL/pgSQL créées');
+    console.log('Fonctions PL/pgSQL créées');
     // ========================
     // 5. TRIGGERS PL/pgSQL
     // ========================
@@ -174,7 +174,7 @@ async function main() {
         throw new Error(`Fichier SQL non trouvé : ${triggersPath}`);
     const triggersSql = fs.readFileSync(triggersPath, 'utf8');
     await prisma.$executeRawUnsafe(triggersSql);
-    console.log('✅ Triggers créés');
+    console.log('Triggers créés');
     // ========================
     // 6. UTILISATEUR ADMIN
     // ========================
@@ -188,17 +188,17 @@ async function main() {
             role: 'admin',
         },
     });
-    console.log('✅ Utilisateur admin créé (login: admin, mot de passe: admin)');
+    console.log('Utilisateur admin créé (login: admin, mot de passe: admin)');
     // ========================
     // 7. CALCUL DES PRÉDICTIONS INITIALES
     // ========================
     await prisma.$executeRaw `SELECT calculer_toutes_predictions()`;
-    console.log('✅ Toutes les prédictions initiales calculées');
-    console.log('🎉 SEED TERMINÉ AVEC SUCCÈS !');
+    console.log('Toutes les prédictions initiales calculées');
+    console.log('SEED TERMINE AVEC SUCCES');
 }
 main()
     .catch(e => {
-    console.error('❌ Erreur pendant le seed :', e);
+    console.error('Erreur pendant le seed :', e);
     process.exit(1);
 })
     .finally(() => prisma.$disconnect());

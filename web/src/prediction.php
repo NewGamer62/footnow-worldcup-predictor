@@ -4,6 +4,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Prédictions</title>
 
 <link rel="stylesheet" href="/css/style.css">
@@ -25,14 +26,14 @@
 
   <div class="main-title">FOOTNOW</div>
 
-  <div class="user-icon" onclick="toggleMenu()">⚽</div>
+  <div class="user-icon" onclick="toggleMenu()" aria-label="Menu utilisateur"></div>
 </header>
 
 <div id="user-menu" class="user-menu">
-  <p>👋 Bonjour <?php echo $_SESSION['user_email']; ?></p>
-  <a href="favorites.php">❤️ Favoris</a>
-  <a href="profile.php">👤 Mon profil</a>
-  <a href="logout.php">🚪 Déconnexion</a>
+  <p>Bonjour <?php echo $_SESSION['user_email']; ?></p>
+  <a href="favorites.php">Favoris</a>
+  <a href="profile.php">Mon profil</a>
+  <a href="logout.php">Deconnexion</a>
 </div>
 
 <nav class="main-menu">
@@ -48,7 +49,7 @@
 <div class="predictions-page">
 
     <section class="home-content">
-      <h1 class="glow-title">⚽ PRÉDICTIONS DES MATCHS ⚽</h1>
+      <h1 class="glow-title">PREDICTIONS DES MATCHS</h1>
     </section>
 
     <div class="predictions-container">
@@ -61,11 +62,11 @@
         <table class="predictions-table">
             <thead>
                 <tr>
-                    <th>🏆 Match</th>
-                    <th>🏠 Victoire Domicile</th>
-                    <th>🤝 Match Nul</th>
-                    <th>✈️ Victoire Extérieur</th>
-                    <th>📅 Date Calcul</th>
+                    <th>Match</th>
+                    <th>Victoire Domicile</th>
+                    <th>Match Nul</th>
+                    <th>Victoire Exterieur</th>
+                    <th>Date Calcul</th>
                 </tr>
             </thead>
             <tbody>
@@ -94,7 +95,7 @@
                     echo htmlspecialchars($p['equipe_dom'] . ' vs ' . $p['equipe_ext']);
                     if ($probaDom > 50 || $probaExt > 50):
                     ?>
-                    <span class="favorite-badge">⭐ FAVORI</span>
+                    <span class="favorite-badge">FAVORI</span>
                     <?php endif; ?>
                 </td>
                 <td class="proba-cell <?php echo $domClass; ?>">
@@ -129,21 +130,21 @@
 
         <div class="predictions-stats">
             <div class="stat-card">
-                <h4>📊 TOTAL MATCHS</h4>
+                <h4>TOTAL MATCHS</h4>
                 <div class="stat-value"><?php echo $totalMatchs; ?></div>
             </div>
             <div class="stat-card">
-                <h4>🏠 FAVORIS DOMICILE</h4>
+                <h4>FAVORIS DOMICILE</h4>
                 <div class="stat-value"><?php echo $favorisDom; ?></div>
                 <div class="stat-label"><?php echo round($favorisDom / $totalMatchs * 100, 1); ?>%</div>
             </div>
             <div class="stat-card">
-                <h4>✈️ FAVORIS EXTÉRIEUR</h4>
+                <h4>FAVORIS EXTERIEUR</h4>
                 <div class="stat-value"><?php echo $favorisExt; ?></div>
                 <div class="stat-label"><?php echo round($favorisExt / $totalMatchs * 100, 1); ?>%</div>
             </div>
             <div class="stat-card">
-                <h4>🤝 MATCHS ÉQUILIBRÉS</h4>
+                <h4>MATCHS EQUILIBRES</h4>
                 <div class="stat-value"><?php echo $matchsNuls; ?></div>
                 <div class="stat-label">Nul > 33%</div>
             </div>
@@ -151,7 +152,7 @@
 
         <?php else: ?>
         <div class="no-predictions">
-            <p>❌ Aucune prédiction trouvée.</p>
+            <p>Aucune prediction trouvee.</p>
             <p>Vérifiez que le seed a bien été exécuté et que l'API est accessible.</p>
             <code>docker compose exec api npx prisma db seed</code>
         </div>
@@ -168,8 +169,11 @@
     <a href="privacy.php">Politique de confidentialité</a>
     <a href="cookies.php">Cookies</a>
     <a href="terms.php">Conditions d'utilisation</a>
+    <a href="data-manager.php">Gerer les donnees</a>
   </div>
 </footer>
 
 </body>
 </html>
+
+
