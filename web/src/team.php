@@ -5,12 +5,14 @@ require_once "auth_check.php";
 <!DOCTYPE html>
 <html>
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Team</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-<h2>🌍 Team</h2>
+<h2>Team</h2>
 
 <select id="teamSelect">
   <option value="Morocco">Morocco</option>
@@ -23,3 +25,5 @@ require_once "auth_check.php";
 
 </body>
 </html>
+
+

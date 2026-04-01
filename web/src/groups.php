@@ -4,6 +4,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Groupes CDM 2026</title>
 
 <link rel="stylesheet" href="/css/style.css">
@@ -27,7 +28,7 @@
     FOOTNOW
   </div>
 
-  <div class="user-icon" onclick="toggleMenu()">⚽</div>
+  <div class="user-icon" onclick="toggleMenu()" aria-label="Menu utilisateur"></div>
 </header>
 
 <nav class="main-menu">
@@ -58,6 +59,7 @@
     <a href="privacy.php">Politique de confidentialité</a>
     <a href="cookies.php">Cookies</a>
     <a href="terms.php">Conditions d'utilisation</a>
+    <a href="data-manager.php">Gerer les donnees</a>
   </div>
 
 </footer>
@@ -65,3 +67,5 @@
 </body>
 
 </html>
+
+

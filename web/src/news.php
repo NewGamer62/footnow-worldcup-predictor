@@ -4,6 +4,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FOOTNOW - Actualité</title>
 
 <link rel="stylesheet" href="/css/style.css">
@@ -33,18 +34,16 @@
   </div>
 
   <!-- USER ICON -->
-  <div class="user-icon" onclick="toggleMenu()">
-    ⚽
-  </div>
+  <div class="user-icon" onclick="toggleMenu()" aria-label="Menu utilisateur"></div>
 
 </header>
 
 <!-- MENU USER (hidden) -->
 <div id="user-menu" class="user-menu">
-  <p>👋 Bonjour <?php echo $_SESSION['user_email']; ?></p>
-  <a href="favorites.php">❤️ Favoris</a>
-  <a href="profile.php">👤 Mon profil</a>
-  <a href="logout.php">🚪 Déconnexion</a>
+  <p>Bonjour <?php echo $_SESSION['user_email']; ?></p>
+  <a href="favorites.php">Favoris</a>
+  <a href="profile.php">Mon profil</a>
+  <a href="logout.php">Deconnexion</a>
 </div>
 
 <!-- MENU -->
@@ -60,7 +59,7 @@
 
 <section class="home-content terms-content">
 
-  <h1 class="glow-title">📰 Actualité Coupe du Monde 2026</h1>
+  <h1 class="glow-title">Actualité Coupe du Monde 2026</h1>
 
   <div class="news-container">
 
@@ -166,6 +165,7 @@
     <a href="privacy.php">Politique de confidentialité</a>
     <a href="cookies.php">Cookies</a>
     <a href="terms.php">Conditions d'utilisation</a>
+    <a href="data-manager.php">Gerer les donnees</a>
   </div>
 
 </footer>
@@ -182,15 +182,18 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
-  margin: 30px 0;
+  width: min(1100px, 94%);
+  margin: 34px auto 16px;
+  padding: 0 10px;
 }
 
 .news-item {
-  background: rgba(255, 255, 255, 0.05);
+  background: transparent;
   border-left: 4px solid #ffd700;
-  padding: 20px;
+  padding: 20px 18px;
   border-radius: 8px;
-  backdrop-filter: blur(10px);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -220,7 +223,20 @@
   line-height: 1.6;
   margin: 0;
 }
+
+@media (max-width: 768px) {
+  .news-container {
+    width: min(1000px, 98%);
+    padding: 0 8px;
+  }
+
+  .news-item {
+    padding: 16px 14px;
+  }
+}
 </style>
 
 </body>
 </html>
+
+

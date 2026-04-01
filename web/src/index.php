@@ -4,6 +4,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FOOTNOW</title>
 
 <link rel="stylesheet" href="/css/style.css">
@@ -22,32 +23,25 @@
 <!-- HEADER -->
 <header class="main-header">
 
-  <!-- LOGO IMAGE -->
   <div class="logo">
     <img src="/assets/images/logo.png" alt="logo">
   </div>
 
-  <!-- TITRE -->
   <div class="main-title">
     FOOTNOW
   </div>
 
-  <!-- USER ICON -->
-  <div class="user-icon" onclick="toggleMenu()">
-    ⚽
-  </div>
+  <div class="user-icon" onclick="toggleMenu()"></div>
 
 </header>
 
-<!-- MENU USER (hidden) -->
 <div id="user-menu" class="user-menu">
-  <p>👋 Bonjour <?php echo $_SESSION['user_email']; ?></p>
-  <a href="favorites.php">❤️ Favoris</a>
-  <a href="profile.php">👤 Mon profil</a>
-  <a href="logout.php">🚪 Déconnexion</a>
+  <p>Bonjour <?php echo $_SESSION['user_email']; ?></p>
+  <a href="favorites.php">Favoris</a>
+  <a href="profile.php">Mon profil</a>
+  <a href="logout.php">Deconnexion</a>
 </div>
 
-<!-- MENU -->
 <nav class="main-menu">
   <a href="index.php">Accueil</a>
   <a href="ranking.php">Classement équipes</a>
@@ -60,13 +54,24 @@
 
 <!-- COUNTDOWN -->
 <div class="countdown">
-  <div><span id="days">0</span><p>Jours</p></div>
-  <div><span id="hours">0</span><p>Heures</p></div>
-  <div><span id="minutes">0</span><p>Minutes</p></div>
-  <div><span id="seconds">0</span><p>Secondes</p></div>
+  <div class="time-box">
+    <span id="days">0</span>
+    <p>Jours</p>
+  </div>
+  <div class="time-box">
+    <span id="hours">0</span>
+    <p>Heures</p>
+  </div>
+  <div class="time-box">
+    <span id="minutes">0</span>
+    <p>Minutes</p>
+  </div>
+  <div class="time-box">
+    <span id="seconds">0</span>
+    <p>Secondes</p>
+  </div>
 </div>
 
-<!-- CONTENT -->
 <section class="home-content">
 
   <h1 class="glow-title">Bienvenue sur FOOTNOW</h1>
@@ -75,76 +80,61 @@
     La plateforme ultime pour analyser les performances des équipes,
     suivre les matchs et prédire les résultats avec précision.
   </p>
-<h2 class="section-title">Prochains matchs</h2>
+
+  <h2 class="section-title">Prochains matchs</h2>
+
   <div class="matches-preview">
 
-  <div class="match-card">
-    <span>🇧🇷 Brésil</span> vs <span>🇲🇦 Maroc</span>
-    <p>12 Juin 2026</p>
-  </div>
+    <div class="match-card">
+      <span>🇧🇷 Brésil</span> vs <span>🇲🇦 Maroc</span>
+      <p>12 Juin 2026</p>
+    </div>
 
-  <div class="match-card">
-    <span>🇫🇷 France</span> vs <span>🇦🇷 Argentine</span>
-    <p>14 Juin 2026</p>
-  </div>
+    <div class="match-card">
+      <span>🇫🇷 France</span> vs <span>🇦🇷 Argentine</span>
+      <p>14 Juin 2026</p>
+    </div>
 
-  <div class="match-card">
-    <span>🇪🇸 Espagne</span> vs <span>🇩🇪 Allemagne</span>
-    <p>15 Juin 2026</p>
-  </div>
+    <div class="match-card">
+      <span>🇪🇸 Espagne</span> vs <span>🇩🇪 Allemagne</span>
+      <p>15 Juin 2026</p>
+    </div>
 
-</div>
+  </div>
 
   <div class="features">
 
     <div class="feature">
-      📊 Analyse des équipes
+      <h3>Analyse des équipes</h3>
+      <p>Compare classement FIFA, forme récente et dynamique de tournoi</p>
     </div>
 
     <div class="feature">
-      ⚽ Données historiques
+      <h3>Données historiques</h3>
+      <p>Exploitation des résultats passés pour révéler les tendances</p>
     </div>
 
     <div class="feature">
-      🔮 Prédictions intelligentes
+      <h3>Prédictions intelligentes</h3>
+      <p>Prédictions grâce aux probabilités</p>
     </div>
 
   </div>
 
 </section>
 
-<script src="/js/app.js"></script>
-
 <footer class="footer">
-
-  <p>© 2026 FOOTNOW - Tous droits réservés</p>
+  <p>©️ 2026 FOOTNOW - Tous droits réservés</p>
 
   <div class="footer-links">
     <a href="privacy.php">Politique de confidentialité</a>
     <a href="cookies.php">Cookies</a>
     <a href="terms.php">Conditions d'utilisation</a>
+    <a href="data-manager.php">Gerer les donnees</a>
   </div>
-
 </footer>
 
-<script>
-const targetDate = new Date("June 8, 2026 00:00:00").getTime();
-
-setInterval(() => {
-    const now = new Date().getTime();
-    const diff = targetDate - now;
-
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-
-    document.getElementById("days").innerText = days;
-    document.getElementById("hours").innerText = hours;
-    document.getElementById("minutes").innerText = minutes;
-    document.getElementById("seconds").innerText = seconds;
-}, 1000);
-</script>
+<script src="/js/app.js"></script>
 
 </body>
 </html>

@@ -1,9 +1,29 @@
-<?php require_once("auth_check.php"); ?>
+<?php
+require_once("auth_check.php");
+
+$createdAtRaw = $_SESSION['user_created_at'] ?? ($_SESSION['registered_created_at'] ?? null);
+
+if (!$createdAtRaw && isset($_SESSION['user_email'])) {
+  $createdAtRaw = date('c');
+  $_SESSION['user_created_at'] = $createdAtRaw;
+}
+
+$createdAtDisplay = 'Non disponible';
+
+if ($createdAtRaw) {
+  try {
+    $createdAtDisplay = (new DateTime($createdAtRaw))->format('d/m/Y');
+  } catch (Exception $e) {
+    $createdAtDisplay = 'Non disponible';
+  }
+}
+?>
 
 <!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FOOTNOW - Mon Profil</title>
 
 <link rel="stylesheet" href="/css/style.css">
@@ -33,18 +53,16 @@
   </div>
 
   <!-- USER ICON -->
-  <div class="user-icon" onclick="toggleMenu()">
-    ⚽
-  </div>
+  <div class="user-icon" onclick="toggleMenu()" aria-label="Menu utilisateur"></div>
 
 </header>
 
 <!-- MENU USER (hidden) -->
 <div id="user-menu" class="user-menu">
-  <p>👋 Bonjour <?php echo $_SESSION['user_email']; ?></p>
-  <a href="favorites.php">❤️ Favoris</a>
-  <a href="profile.php">👤 Mon profil</a>
-  <a href="logout.php">🚪 Déconnexion</a>
+  <p>Bonjour <?php echo $_SESSION['user_email']; ?></p>
+  <a href="favorites.php">Favoris</a>
+  <a href="profile.php">Mon profil</a>
+  <a href="logout.php">Deconnexion</a>
 </div>
 
 <!-- MENU -->
@@ -75,12 +93,12 @@
 
     <div class="profile-field">
       <label>Date d'inscription :</label>
-      <span><?php echo date('d/m/Y', strtotime($_SESSION['user_created_at'] ?? '2026-01-01')); ?></span>
+      <span><?php echo $createdAtDisplay; ?></span>
     </div>
 
     <div class="profile-field">
       <label>Équipes favorites :</label>
-      <span id="favorites-count">0</span>
+      <span id="favorites-count" class="counter-value">0</span>
     </div>
   </div>
 
@@ -121,20 +139,13 @@ function exportProfile() {
 
 function updateFavoritesCount() {
   const favorites = JSON.parse(localStorage.getItem('favorites')) || [];
-  document.getElementById('favorites-count').textContent = favorites.length;
+  const counter = document.getElementById('favorites-count');
+  if (!counter) return;
+  counter.textContent = favorites.length;
 }
 
 document.addEventListener('DOMContentLoaded', updateFavoritesCount);
 </script>
-
-<style>
-.glow-title {
-  color: #fff;
-  text-shadow: 0 0 10px #ffd700, 0 0 20px #ffd700, 0 0 30px #ffd700, 0 0 40px #ffd700;
-  font-weight: bold;
-  letter-spacing: 2px;
-}
-</style>
 
 <footer class="footer">
 
@@ -144,9 +155,12 @@ document.addEventListener('DOMContentLoaded', updateFavoritesCount);
     <a href="privacy.php">Politique de confidentialité</a>
     <a href="cookies.php">Cookies</a>
     <a href="terms.php">Conditions d'utilisation</a>
+    <a href="data-manager.php">Gerer les donnees</a>
   </div>
 
 </footer>
 
 </body>
 </html>
+
+
