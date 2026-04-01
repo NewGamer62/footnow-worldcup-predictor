@@ -3,3 +3,26 @@ dist/
 *.log
 .env
 .DS_Store
+
+# Prisma generated files
+api/prisma/*.js
+api/prisma/*.js.map
+api/prisma/*.d.ts
+api/prisma/*.d.ts.map
+
+# Build artifacts
+api/*.d.ts
+api/*.d.ts.map
+api/*.js.map
+api/vitest.config.d.ts
+api/vitest.config.js
+api/vitest.config.js.map
+api/prisma.config.d.ts
+api/prisma.config.js
+api/prisma.config.js.map
+
+# Web generated data
+web/src/data/*.json
+
+# Temporary files
+api/temp.js
