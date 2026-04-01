@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { prisma } from './client.js';
+import { prisma } from './client';
 const router = Router();
 /**
  * GET /api/equipes
@@ -128,33 +128,73 @@ router.get('/groupes', async (_req, res) => {
 });
 /**
  * GET /api/probabilites-2026
- * Estime les probabilités de titre pour 2026 via les points FIFA
+ * Calcule les probabilités de titre avec : 70% classement FIFA + 30% forme récente
  */
 router.get('/probabilites-2026', async (_req, res) => {
     try {
-        const equipes = await prisma.equipe.findMany({
-            where: { points_fifa: { not: null } },
-            orderBy: { points_fifa: 'desc' },
-            take: 20,
-            select: {
-                nom: true,
-                points_fifa: true,
-                classement: true
-            }
+        // Récupérer les équipes qualifiées pour la CDM 2026
+        const qualifiees = await prisma.matchCdm2026.findMany({
+            select: { equipe_dom: true, equipe_ext: true }
         });
-        const totalPoints = equipes.reduce((acc, team) => {
-            const points = Number(team.points_fifa) || 0;
-            return acc + points;
-        }, 0);
-        const favoris = equipes.map((team, index) => {
-            const points = Number(team.points_fifa) || 0;
-            const probabilite = totalPoints > 0 ? (points / totalPoints) * 100 : 0;
-            return {
-                classement: team.classement ?? index + 1,
-                equipe: team.nom,
+        const nomsEquipes = new Set();
+        qualifiees.forEach(m => {
+            if (m.equipe_dom && m.equipe_dom !== 'To be announced')
+                nomsEquipes.add(m.equipe_dom);
+            if (m.equipe_ext && m.equipe_ext !== 'To be announced')
+                nomsEquipes.add(m.equipe_ext);
+        });
+        // Récupérer les équipes avec leurs stats
+        const equipes = await prisma.equipe.findMany({
+            where: {
+                points_fifa: { not: null },
+                nom: { in: Array.from(nomsEquipes) }
+            },
+            orderBy: { points_fifa: 'desc' },
+            take: 20
+        });
+        // Calculer les scores
+        const scores = [];
+        let totalScore = 0;
+        // Normalisation des points FIFA (min-max)
+        const pointsFifa = equipes.map(e => Number(e.points_fifa) || 0);
+        const maxFifa = Math.max(...pointsFifa);
+        const minFifa = Math.min(...pointsFifa);
+        for (const equipe of equipes) {
+            // 1. Score Classement FIFA (normalisé entre 0 et 1)
+            const points = Number(equipe.points_fifa) || 0;
+            const scoreClassement = maxFifa !== minFifa
+                ? (points - minFifa) / (maxFifa - minFifa)
+                : 0.5;
+            // 2. Score Forme (moyenne des 20 derniers matchs)
+            const formeData = await prisma.$queryRaw `
+        SELECT get_forme_recente(${equipe.nom}) as get_forme_recente
+      `;
+            let scoreForme = formeData[0]?.get_forme_recente || 0.5;
+            // 3. Score final (70% classement, 30% forme)
+            const scoreFinal = (scoreClassement * 0.7) + (scoreForme * 0.3);
+            scores.push({
+                equipe: equipe.nom,
+                classement: equipe.classement,
                 points_fifa: points,
-                probabilite_titulo: Number(probabilite.toFixed(2))
-            };
+                score_classement: scoreClassement,
+                score_forme: scoreForme,
+                score_final: scoreFinal
+            });
+            totalScore += scoreFinal;
+        }
+        // Calculer les probabilités
+        const favoris = scores.map((s, index) => ({
+            classement: s.classement ?? index + 1,
+            equipe: s.equipe,
+            points_fifa: s.points_fifa,
+            score_classement: Number((s.score_classement * 100).toFixed(1)),
+            score_forme: Number((s.score_forme * 100).toFixed(1)),
+            probabilite_titulo: Number(((s.score_final / totalScore) * 100).toFixed(2))
+        }));
+        // Trier par probabilité décroissante
+        favoris.sort((a, b) => b.probabilite_titulo - a.probabilite_titulo);
+        favoris.forEach((f, index) => {
+            f.classement = index + 1;
         });
         res.json({
             total: favoris.length,
@@ -171,7 +211,7 @@ router.get('/probabilites-2026', async (_req, res) => {
 });
 /**
  * GET /api/scores/fifa/:equipe
- * Obtient le score FIFA normalisé (0-1) pour une équipe
+ * Obtient le score FIFA normalisé(0-1) pour une équipe
  */
 router.get('/scores/fifa/:equipe', async (req, res) => {
     try {

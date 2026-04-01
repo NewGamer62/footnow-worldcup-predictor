@@ -1,4 +1,5 @@
 {
+  "type": "module",
   "name": "footnow-api",
   "version": "1.0.0",
   "description": "API for FOOTNOW application",
