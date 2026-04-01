@@ -6,6 +6,7 @@ $success = false;
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $_SESSION['registered_email'] = $_POST['email'];
     $_SESSION['registered_password'] = $_POST['password'];
+    $_SESSION['registered_created_at'] = date('c');
 
     $success = true;
 }
@@ -15,6 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Inscription</title>
 
 <link rel="stylesheet" href="/css/style.css">
@@ -56,3 +58,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 </body>
 </html>
+
+

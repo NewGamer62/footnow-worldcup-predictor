@@ -6,6 +6,7 @@ require_once "auth_check.php";
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Historique Matchs</title>
   <link rel="stylesheet" href="/css/style.css">
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
@@ -25,14 +26,14 @@ require_once "auth_check.php";
 
   <div class="main-title">FOOTNOW</div>
 
-  <div class="user-icon" onclick="toggleMenu()">⚽</div>
+  <div class="user-icon" onclick="toggleMenu()" aria-label="Menu utilisateur"></div>
 </header>
 
 <div id="user-menu" class="user-menu">
-  <p>👋 Bonjour <?php echo $_SESSION['user_email']; ?></p>
-  <a href="favorites.php">❤️ Favoris</a>
-  <a href="profile.php">👤 Mon profil</a>
-  <a href="logout.php">🚪 Déconnexion</a>
+  <p>Bonjour <?php echo $_SESSION['user_email']; ?></p>
+  <a href="favorites.php">Favoris</a>
+  <a href="profile.php">Mon profil</a>
+  <a href="logout.php">Deconnexion</a>
 </div>
 
 <nav class="main-menu">
@@ -62,8 +63,11 @@ require_once "auth_check.php";
     <a href="privacy.php">Politique de confidentialité</a>
     <a href="cookies.php">Cookies</a>
     <a href="terms.php">Conditions d'utilisation</a>
+    <a href="data-manager.php">Gerer les donnees</a>
   </div>
 </footer>
 
 </body>
 </html>
+
+

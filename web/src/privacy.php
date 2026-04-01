@@ -4,6 +4,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FOOTNOW - Politique de confidentialité</title>
 
 <link rel="stylesheet" href="/css/style.css">
@@ -33,18 +34,16 @@
   </div>
 
   <!-- USER ICON -->
-  <div class="user-icon" onclick="toggleMenu()">
-    ⚽
-  </div>
+  <div class="user-icon" onclick="toggleMenu()" aria-label="Menu utilisateur"></div>
 
 </header>
 
 <!-- MENU USER (hidden) -->
 <div id="user-menu" class="user-menu">
-  <p>👋 Bonjour <?php echo $_SESSION['user_email']; ?></p>
-  <a href="favorites.php">❤️ Favoris</a>
-  <a href="profile.php">👤 Mon profil</a>
-  <a href="logout.php">🚪 Déconnexion</a>
+  <p>Bonjour <?php echo $_SESSION['user_email']; ?></p>
+  <a href="favorites.php">Favoris</a>
+  <a href="profile.php">Mon profil</a>
+  <a href="logout.php">Deconnexion</a>
 </div>
 
 <!-- MENU -->
@@ -106,9 +105,12 @@
     <a href="privacy.php">Politique de confidentialité</a>
     <a href="cookies.php">Cookies</a>
     <a href="terms.php">Conditions d'utilisation</a>
+    <a href="data-manager.php">Gerer les donnees</a>
   </div>
 
 </footer>
 
 </body>
 </html>
+
+

@@ -1,14 +1,38 @@
-// Auteur : Ahmed Fikri
+// Auteur : Ahmed Fikri, Selyan Mohammedi
 
 import { parse } from 'csv-parse/sync'
 import * as fs from 'fs'
 import * as path from 'path'
 import bcrypt from 'bcryptjs'
 import { prisma } from '../src/client.js'
-import type { Prisma } from '@prisma/client'
+
+const INVALID_TEXT_VALUES = new Set(['', 'NA', 'N/A', 'NULL', 'UNDEFINED'])
+
+function cleanTextValue(value: unknown): string | null {
+  if (value === null || value === undefined) {
+    return null
+  }
+
+  const text = String(value).trim()
+  if (!text) {
+    return null
+  }
+
+  return INVALID_TEXT_VALUES.has(text.toUpperCase()) ? null : text
+}
+
+function parseNullableScore(value: unknown): number | null {
+  const cleaned = cleanTextValue(value)
+  if (cleaned === null) {
+    return null
+  }
+
+  const parsed = Number(cleaned)
+  return Number.isInteger(parsed) && parsed >= 0 ? parsed : null
+}
 
 async function main() {
-  console.log('🚀 Début du seed Coupe du Monde 2026...')
+  console.log('Démarrage du seed...')
 
   // Détection du répertoire de données 
   const candidateDirs = [
@@ -16,12 +40,10 @@ async function main() {
     path.join(process.cwd(), '../db/data'), // local : depuis api/ => ../db/data
   ]
   const dataDir = candidateDirs.find(d => fs.existsSync(d)) ?? candidateDirs[1]
-  console.log(`📁 Répertoire de données : ${dataDir}`)
+  console.log(`Répertoire de données : ${dataDir}`)
 
-  // -----------------------------
   // Nettoyage des tables 
-  // -----------------------------
-console.log('🧹 Nettoyage des tables existantes...')
+console.log('Nettoyage des tables existantes...')
   // Skip delete if tables empty (seed safe)
   try { await prisma.prediction.deleteMany() } catch (e) { console.log('prediction skip') }
   try { await prisma.resultat.deleteMany() } catch (e) { console.log('resultat skip') }
@@ -32,7 +54,7 @@ console.log('🧹 Nettoyage des tables existantes...')
   try { await prisma.utilisateur.deleteMany() } catch (e) { console.log('user skip') }
   try { await prisma.groupe.deleteMany() } catch (e) { console.log('groupe skip') }
   try { await prisma.equipe.deleteMany() } catch (e) { console.log('equipe skip') }
-  console.log('✅ Nettoyage terminé (tables vides skip OK)')
+  console.log('Nettoyage terminé')
 
   // ========================
   // 1. ÉQUIPES + CLASSEMENT FIFA
@@ -53,7 +75,7 @@ console.log('🧹 Nettoyage des tables existantes...')
       },
     })
   }
-  console.log(`✅ ${rankingData.length} équipes + classement FIFA importés`)
+  console.log(`-> ${rankingData.length} équipes + classement FIFA importés`)
 
   // ========================
   // 2. MATCHS HISTORIQUES
@@ -64,24 +86,38 @@ console.log('🧹 Nettoyage des tables existantes...')
   const historyData = parse(historyCsv, { columns: true, skip_empty_lines: true })
 
   let historyCount = 0
+  let skippedHistoryCount = 0
   for (const row of historyData) {
-    const score1Str = row.scoreteam1 || '0'
-    const score2Str = row.scoreteam2 || '0'
+    const equipe1 = cleanTextValue(row.team1 || row.equipe1)
+    const equipe2 = cleanTextValue(row.team2 || row.equipe2)
+    const tournoi = cleanTextValue(row.tournament || row.tournoi)
+    const pays = cleanTextValue(row.country || row.pays)
+    const score1 = parseNullableScore(row.scoreteam1)
+    const score2 = parseNullableScore(row.scoreteam2)
+
+    if (!equipe1 || !equipe2 || !tournoi || !pays || score1 === null || score2 === null) {
+      skippedHistoryCount++
+      continue
+    }
+
+    const dateMatchRaw = cleanTextValue(row.date)
+    const dateMatch = dateMatchRaw ? new Date(dateMatchRaw) : null
+    const safeDateMatch = dateMatch && !Number.isNaN(dateMatch.getTime()) ? dateMatch : null
 
     await prisma.matchHistorique.create({
       data: {
-        date_match: row.date && row.date !== 'NA' ? new Date(row.date) : null,
-        equipe1: String(row.team1 || row.equipe1).trim(),
-        equipe2: String(row.team2 || row.equipe2).trim(),
-        score1: score1Str !== 'NA' ? parseInt(score1Str) : null,
-        score2: score2Str !== 'NA' ? parseInt(score2Str) : null,
-        tournoi: String(row.tournament || row.tournoi).trim(),
-        pays: String(row.country || row.pays).trim(),
+        date_match: safeDateMatch,
+        equipe1,
+        equipe2,
+        score1,
+        score2,
+        tournoi,
+        pays,
       },
     })
     historyCount++
   }
-  console.log(`✅ ${historyCount} matchs historiques importés`)
+  console.log(`-> ${historyCount} matchs historiques importés (${skippedHistoryCount} ignores car incomplets)`)
 
   // ========================
   // 3. MATCHS CDM 2026 & GROUPES
@@ -106,10 +142,10 @@ console.log('🧹 Nettoyage des tables existantes...')
       create: { nom: groupName },
     })
   }
-  console.log(`✅ ${groupNames.length} groupes créés`)
+  console.log(`-> ${groupNames.length} groupes créés`)
 
   const groupes = await prisma.groupe.findMany()
-  const groupMap = new Map(groupes.map(g => [g.nom.toLowerCase().trim(), g.id_groupe]))
+  const groupMap = new Map(groupes.map((g: { nom: string; id_groupe: number }) => [g.nom.toLowerCase().trim(), g.id_groupe]))
 
   let wcCount = 0
   for (const row of wcData) {
@@ -127,30 +163,18 @@ console.log('🧹 Nettoyage des tables existantes...')
     })
     wcCount++
   }
-  console.log(`✅ ${wcCount} matchs Coupe du Monde 2026 importés`)
+  console.log(`-> ${wcCount} matchs Coupe du Monde 2026 importés`)
 
   // ========================
-  // 4. FONCTIONS PL/pgSQL
+  // 4. FONCTIONS/TRIGGERS SQL
   // ========================
-  // Chemin absolu /db/ monté dans le conteneur
-  const functionsPath = '/db/functions.sql'
-  if (!fs.existsSync(functionsPath)) throw new Error(`Fichier SQL non trouvé : ${functionsPath}`)
-  const functionsSql = fs.readFileSync(functionsPath, 'utf8')
-  await prisma.$executeRawUnsafe(functionsSql)
-  console.log('✅ Fonctions PL/pgSQL créées')
+  // Ces scripts sont deja executes par PostgreSQL au demarrage
+  // via /docker-entrypoint-initdb.d.
+  console.log('Fonctions et triggers SQL deja initialises par la base')
 
-  // ========================
-  // 5. TRIGGERS PL/pgSQL
-  // ========================
-  const triggersPath = '/db/triggers.sql'
-  if (!fs.existsSync(triggersPath)) throw new Error(`Fichier SQL non trouvé : ${triggersPath}`)
-  const triggersSql = fs.readFileSync(triggersPath, 'utf8')
-  await prisma.$executeRawUnsafe(triggersSql)
-  console.log('✅ Triggers créés')
-
-  // ========================
-  // 6. UTILISATEUR ADMIN
-  // ========================
+ 
+  // 5. UTILISATEUR ADMIN
+ 
   const adminPassword = await bcrypt.hash('admin', 10)
   await prisma.utilisateur.upsert({
     where: { login: 'admin' },
@@ -161,20 +185,24 @@ console.log('🧹 Nettoyage des tables existantes...')
       role: 'admin',
     },
   })
-  console.log('✅ Utilisateur admin créé (login: admin, mot de passe: admin)')
+  console.log('Utilisateur admin créé (login: admin, mot de passe: admin)')
 
   // ========================
-  // 7. CALCUL DES PRÉDICTIONS INITIALES
+  // 6. CALCUL DES PRÉDICTIONS INITIALES
   // ========================
-  await prisma.$executeRaw`SELECT calculer_toutes_predictions()`
-  console.log('✅ Toutes les prédictions initiales calculées')
+  try {
+    await prisma.$executeRaw`SELECT calculer_toutes_predictions()`
+    console.log('Prédictions initiales calculées')
+  } catch (_e) {
+    console.log('calculer_toutes_predictions indisponible, etape ignoree')
+  }
 
-  console.log('🎉 SEED TERMINÉ AVEC SUCCÈS !')
+  console.log('Fin du traitement du seed.')
 }
 
 main()
   .catch(e => {
-    console.error('❌ Erreur pendant le seed :', e)
+    console.error('Erreur pendant le seed :', e)
     process.exit(1)
   })
   .finally(() => prisma.$disconnect())
