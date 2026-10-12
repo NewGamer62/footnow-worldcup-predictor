@@ -1,301 +1,99 @@
-[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/Tg-sf9xJ)
-[![Open in Visual Studio Code](https://classroom.github.com/assets/open-in-vscode-2e0aaae1b6195c2367325f4f02e2d04e9abb55f0b24a779b69b11b9e10269abc.svg)](https://classroom.github.com/online_ide?assignment_repo_id=23263337&assignment_repo_type=AssignmentRepo)
-# SAÉ BUT Informatique 2 – Projet Web & API Dockerisé
+# ⚽ FootNow – World Cup Predictor & Analytics Platform
 
-Ce dépôt constitue la **base de travail** dans le cadre de la SAÉ de 2ᵉ année BUT Informatique (développement web & API).
-
-Les étudiants travailleront **en groupe de 3 à 5**, via **GitHub**, et devront compléter / étendre ce socle technique.
-
----
-
-## 📘 Sujet de la SAÉ
-
-### 🎯 Contexte général
-
-Vous êtes une **équipe de développement** chargée de concevoir une application web permettant :
-
-* de **collecter et stocker des données réelles existantes**
-* de **gérer de nouveaux événements** liés à ces données
-* de **produire des indicateurs ou prédictions simples** sur les résultats possibles
-
-L’application reposera sur :
-
-* une **API REST**
-* une **base de données relationnelle**
-* une **interface web PHP**
+<p align="center">
+  <img src="https://img.shields.io/badge/TypeScript-Node.js%20Express-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/PostgreSQL-Prisma%20ORM-336791?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL" />
+  <img src="https://img.shields.io/badge/Docker-Multi--Container-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker" />
+  <img src="https://img.shields.io/badge/Frontend-PHP%20%2F%20Apache-777BB4?style=for-the-badge&logo=php&logoColor=white" alt="PHP" />
+  <img src="https://img.shields.io/badge/Swagger-OpenAPI%203.0-85EA2D?style=for-the-badge&logo=swagger&logoColor=black" alt="Swagger" />
+  <img src="https://img.shields.io/badge/Tests-Vitest%20(Coverage%20%3E%2090%25)-6E9F18?style=for-the-badge&logo=vitest&logoColor=white" alt="Vitest" />
+</p>
 
 ---
 
-### 🧩 Choix du thème (libre)
+## 📌 Présentation
 
-Chaque groupe choisira un **domaine disposant d’un volume de données exploitable**, par exemple :
+**FootNow** est une plateforme web et API full-stack conteneurisée dédiée à l'analyse sportive et à la prédiction des confrontations de la Coupe du Monde 2026.
 
-* 🎮 Tournois de jeux vidéo (e-sport)
-* ⚽ Championnats sportifs (football, basket, F1, etc.)
-* 🎲 Jeux de hasard (loteries, dés, cartes – sans argent réel)
-* 🏆 Compétitions culturelles ou artistiques
-* 📊 Classements, saisons, séries d’événements
-
-Le thème doit permettre :
-
-* des **résultats passés** (historique)
-* des **événements à venir**
-* des **comparaisons ou probabilités**
+L'application combine une architecture orientée services (micro-conteneurs Docker) :
+- Une **API REST sécurisée** en TypeScript/Node.js propulsée par Express et documentée via Swagger/OpenAPI.
+- Une couche de persistance relationnelle haute performance sur **PostgreSQL**, pilotée via l'ORM **Prisma** avec migrations versionnées et procédures de seeding automatisées.
+- Un moteur de **calcul statistique de probabilités** basé sur l'historique des confrontations internationales, la forme récente et les métriques d'attaque/défense.
+- Une **application web PHP** moderne consommant l'API en temps réel, intégrant gestion des sessions, authentification et administration des équipes et matchs.
 
 ---
 
-### 🔮 Notion de prédiction attendue
+## 🏛️ Architecture & Services Docker
 
-Les prédictions peuvent être **simples et explicables**, par exemple :
-
-* probabilité de victoire basée sur l’historique
-* moyenne, tendance, classement projeté
-* comparaison statistique entre entités
-
-❗ Aucun machine learning avancé n’est requis.
-
----
-
-## 🧱 Attendus techniques obligatoires
-
-### API (Node.js / TypeScript)
-
-* API REST structurée (Express)
-* Accès base de données via **Prisma**
-* Documentation **Swagger** complète
-* Gestion des erreurs et validations
-* Tests unitaires avec **Vitest**
-
-#### 🔬 Tests et qualité
-
-* Couverture de code **≥ 90 %** (statements, branches, functions)
-* Rapport de coverage fourni (`vitest --coverage`)
-* Tests automatisés reproductibles
-
----
-
-### Base de données
-
-* Modélisation relationnelle cohérente
-* Contraintes d’intégrité
-* Migrations Prisma versionnées
-
----
-
-### Application Web PHP
-
-* Consommation de l’API via HTTP
-* Affichage structuré des données
-* Interfaces de création / consultation
-* Gestion des erreurs API
-
----
-
-## 📦 Livrables attendus
-
-* Dépôt GitHub complet
-* README final enrichi :
-  * présentation du thème (découpes du code, structures des différentes parties, ...)
-  * schéma de données
-  * routes API
-  * logique de prédiction
-* Rapport de coverage Vitest
-* Jeu de données initial documenté
-
-Le site PHP devra : 
-* Présenter votre thématique
-* Présenter les membres de l'équipe (avec leurs rôles dans le projet et leurs réalisations)
-* Permettre la consultation des données
-* Permettre une inscription et une authentification qui donne accès à : 
-  * L'ajout de novuelles données
-  * La partie de prédiction
-
-L'identification est nécessaire depuis la partie PHP mais également depuis la partie API
-
----
-
-## 🎯 Objectifs pédagogiques
-
-* Concevoir et développer une **API REST** en Node.js / TypeScript
-* Manipuler une **base de données PostgreSQL** via un ORM (Prisma)
-* Consommer une API depuis une application web PHP
-* Travailler avec **Docker & Docker Compose**
-* Structurer un projet full‑stack professionnel
-* Travailler en équipe (Git, organisation, documentation)
-
----
-
-## 🧱 Architecture générale
-
-Le projet est composé de **3 services Docker**, chacun dans un sous‑répertoire dédié :
+Le projet est entièrement orchestré via Docker Compose en 3 services isolés et interconnectés sur un réseau privé :
 
 ```
-.
-├── api/            # API Node.js (TypeScript, Express, Prisma)
-├── db/             # Base de données PostgreSQL
-├── web/            # Serveur Apache + PHP
-├── deploy.sh       # Script d'auto déploiement avec redémarrage sur JrCanDev
-├── docker-compose.jrcandev.yml    # Version pour le déploiement sur JrCanDev
-├── docker-compose.yml             # Version par défaut, notamment pour le test en local
-├── .env
+footnow-worldcup-predictor/
+├── api/                             # Service API REST
+│   ├── src/                         # Contrôleurs, routes, middlewares & logique métier
+│   ├── prisma/                      # Schéma Prisma, migrations SQL & seed data
+│   ├── tests/                       # Suite de tests unitaires et intégration (Vitest)
+│   ├── Dockerfile                   # Build multi-stage Node.js
+│   └── swagger.json                 # Documentation OpenAPI
+├── db/                              # Service Base de données PostgreSQL
+│   └── init/                        # Scripts SQL d'initialisation
+├── web/                             # Service Front-End Web
+│   ├── src/                         # Vues, templates PHP & consommation API cURL
+│   └── Dockerfile                   # Image Apache PHP optimisée
+├── docker-compose.yml               # Orchestration locale
+├── docker-compose.jrcandev.yml      # Profil d'orchestration pour déploiement serveur
+├── deploy.sh                        # Script CI/CD d'automatisation des déploiements
 └── README.md
 ```
 
-Chaque service est **indépendant**, mais communique via le réseau Docker.
+---
+
+## ✨ Fonctionnalités Clés
+
+- **Moteur de Prédiction Statistique** :
+  - Calcul explicable des probabilités de victoire (Équipe A / Nul / Équipe B) basé sur les séries de scores, la dynamique de victoire et les classements relatifs.
+  - Déclenchement automatique des simulations lors de l'enregistrement de nouvelles rencontres.
+- **API REST Robuste & Typée** :
+  - Validation stricte des payloads, gestion centralisée des erreurs et codes HTTP normalisés.
+  - Authentification par jetons et routes d'administration protégées.
+  - Suite de tests avec **Vitest atteignant plus de 90% de couverture de code**.
+- **Conteneurisation & Déploiement Continu** :
+  - Variables d'environnement unifiées via `.env`.
+  - Script `deploy.sh` automatisant la mise à jour des conteneurs, l'application des migrations Prisma et le redémarrage sans interruption.
 
 ---
 
-## 🐳 Docker Compose (racine)
+## 👨‍💻 Rôle & Contributions Personnelles (Noa Gaillard)
 
-### `docker-compose.yml`
-cf. ./docker-compose.yml
-
-### `docker-compose.jrcandev.yml` (utilisé pour le déploiement sur JrCanDev)
-cf. ./docker-compose.jrcandev.yml
-
----
-
-## 🔐 Variables d'environnement
-
-### `.env`
-```
-# Docker Compose
-NAME=sae-web-but2-votrenomcompletici
-
-# PostgreSQL
-POSTGRES_USER=sae_user
-POSTGRES_PASSWORD=sae_password
-POSTGRES_DB=sae_db
-POSTGRES_HOST=db
-POSTGRES_PORT=5432
-
-# API
-API_PORT=3070
-DATABASE_URL=postgresql://sae_user:sae_password@db:5432/sae_db
-```
+Dans ce projet d'équipe :
+- **Spécifications Techniques & Cadrage Fonctionnel** : Rédaction complète du cahier des charges et modélisation des besoins utilisateurs.
+- **Design UI/UX & Prototypage** : Conception intégrale des maquettes de l'application sous Figma (`MaquetteFootNow.pdf`), établissant l'ensemble des parcours de navigation, des formulaires et des tableaux de bord statistiques.
+- **Infra Docker & Scripts d'Entrée** : Conception des scripts d'entrypoint Docker et harmonisation de la configuration multi-plateforme (`.gitattributes`, gestion des fins de ligne LF/CRLF entre environnements Linux et Windows).
+- **Intégration & Revue de Code** : Gestion des fusions de branches, harmonisation des variables d'environnement de production et validation des points de terminaison de l'API.
 
 ---
 
-## 🗄️ Base de données (db)
+## 🚀 Démarrage Rapide
 
-Aucun Dockerfile spécifique n’est requis ici. La base PostgreSQL est fournie via l’image officielle.
+### Prérequis
+- [Docker](https://www.docker.com/) & Docker Compose installés sur votre machine
 
-Vous utiliserez **Prisma** côté API pour gérer le schéma et les migrations.
+### Lancement avec Docker Compose
 
----
-
-## 🚀 API Node.js / TypeScript
-
-### `Dockerfile`
-cf. ./api/Dockerfile
-
-### `Dockerfile.jrcandev`
-cf. ./api/Dockerfile.jrcandev
-
-### `package.json`
-cf. ./api/package.json
-
-### `tsconfig.json`
-cf. ./api/tsconfig.json
-
-### `index.ts`
-cf. ./api/src/index.ts
-
----
-
-## 🌐 Serveur Web PHP
-
-### `Dockerfile`
-cf. ./web/Dockerfile
-
-### `index.php`
-cf. ./web/src/index.php
-
----
-
-## ▶️ Lancer le projet
-
-À la racine du projet, commencez par créer votre .env en le complétant correctement, et ensuite vérifiez qu'il est bien considéré par docker avec la commande : 
 ```bash
-docker compose config
-```
-Vous devriez voir les informations de vos differents conteneurs, et notamment l'interpretation de votre NAME dans les différents ``container_name``. si vous voyez encore apparaitre ``${NAME}_postgres``, ``${NAME}_api``, et ``${NAME}_web``, alors votre ``.env`` n'est pas correct et doit être ajusté avant d'aller plus loin.
+# 1. Cloner le dépôt
+git clone https://github.com/NewGamer62/footnow-worldcup-predictor.git
+cd footnow-worldcup-predictor
 
-A présent, le réseau web pour vos conteneurs dockers doit être présent sur votre machine. Si il ne l'est pas encore, vous pouvez le créer avec la commande : 
-```bash
-docker network create web
-```
+# 2. Configurer les variables d'environnement
+cp .env.example .env   # ou éditer le fichier .env
 
-Si tout est OK, vous pouvez construire et lancer votre projet en l'état pour vérifier que la base est opérationnelle avec la commande : 
-```bash
-docker compose up --build
+# 3. Lancer l'ensemble des conteneurs (DB, API, Web)
+docker compose up --build -d
 ```
 
-Accès aux services :
-### En version locale
-* 🌍 Application PHP : [http://localhost:8080](http://localhost:8080)
-* 🔌 API : [http://localhost:3070/api](http://localhost:3070/api)
-* ❤️ Healthcheck API : [http://localhost:3070/api/health](http://localhost:3070/api/health)
-* 🐘 PostgreSQL : localhost:5432
-
-Lors du premier lancement du projet, vérifiez ces 2 éléments
-* http://localhost:8080/ --> Devrait afficher "SAÉ BUT2 – Application Web PHP"
-* http://localhost:3070/api/health --> Devrait afficher "{"status":"ok","api":"up","database":"up"}"
-
-La partie déploiement sur un environnement jrcandev est détaillée un peu plus bas dans ce document, mais dans tous les cas, l'environnement local doit **TOUJOURS** être opérationnel (il pourra être utilisé pour l'évaluation de votre travail).
-
----
-
-## 📚 Travail attendu 
-
-Chaque groupe devra notamment :
-* Concevoir le **schéma de base de données**
-* Implémenter des **routes API REST documentées (Swagger)**
-* Ajouter des **tests unitaires** (Vitest)
-* Consommer l’API depuis le site PHP
-* Gérer les erreurs, les validations, la sécurité
-* Documenter son travail
-
-## Note complémentaire !
-Assurez-vous que lorsque **quelqu'un d'autre que vous** télécharge votre dépôt final, il est complet, avec les données et est executable en l'état pour pouvoir vous évaluer ;-)
-
-## Déploiement JrCanDev 
-Le projet devra être déployé sur JrCanDev pour être accessible pour les enseignants chargés de l’évaluation de la SAE. 
-Vous solliciterez donc un environnement spécifique sur JrCanDev. Ce dernier sera en lien avec la branche ``jrcandev`` (que vous devrez donc **impérativement** avoir sur votre dépôt gitHub) par le biais d’un webhook.
-
-Un (**et 1 seul**) étudiant de chaque groupe fera la demande sur [le discord de JrCanDev](https://discord.gg/hmfnabKSUB) dans le salon ``#hébergement-projets`` , et si vous avez des demandes techniques particulières, vous passerez par le salon ``#demande-assistance`` sur ce même serveur.
-
-**IMPORTANT**
-Un certain nombre d'éléments devront être ajustés sur votre dépot gitHub pour que le process de CI/CD soit pleinement fonctionnel, et vous aurez besoin de valider les éléments avec les personnes de JrCanDev (qui ne sont pas à disposition H24) donc assurez-vous que cette mise en place soit opérationnel **au plus tôt** durant votre projet.
-
-Pour information, durant la journée du Mercredi 25, nous serons disponibles pour vous accompagner sur ce sujet spécifiquement.
-
-Vous documenterez la procédure permettant de déployer votre projet à partir des sources (paramétrage du dépôt, étapes d’initialisation, quel déclencheur, dans quel contexte, …).
-
-### Sur votre version hébergée sur JrCanDev, vous devriez donc avoir 
-* 🌍 Application PHP : [https://nomDeVotreProjet.jrcan.dev/](https://nomDeVotreProjet.jrcan.dev)
-* 🔌 API : [https://nomDeVotreProjet.jrcan.dev/api](https://nomDeVotreProjet.jrcan.dev/api)
-* ❤️ Healthcheck API : [https://nomDeVotreProjet.jrcan.dev/api/health](https://nomDeVotreProjet.jrcan.dev/api/health)
-* 🐘 PostgreSQL : [https://nomDeVotreProjet.jrcan.dev:5432](https://nomDeVotreProjet.jrcan.dev:5432)
-
-Lors du premier déploiement de votre projet sur JrCanDev, vérifiez ces 2 éléments
-* https://nomDeVotreProjet.jrcan.dev/ --> Devrait afficher "SAÉ BUT2 – Application Web PHP"
-* https://nomDeVotreProjet.jrcan.dev/api/health --> Devrait afficher "{"status":"ok","api":"up","database":"up"}"
-
----
-
-## 🧠 Quelques conseils pédagogiques
-* Bien identifier votre sujet, les données dont vous aurez besoin
-* Vous assurer de pouvoir créer / récupérer un jeu de données suffisant pour vos prédictions
-* Réaliser votre schema pour Prisma (sans oublier la migration et le generate)
-* Ajouter vos données (idealement d'une manière propre via le seed ^_^ )
-* Tester l’API indépendamment (Postman, Swagger)
-* Versionner régulièrement (1 nouvelle fonctionnalité = 1 commit)
-* Tout cela bien évidemment en se répartissant clairement les rôles
-
-Bon courage et bon dev 🚀
-
-
----
-
-
+### Accès aux Services Locaux
+- 🌍 **Interface Web PHP** : [http://localhost:8080](http://localhost:8080)
+- 🔌 **API REST** : [http://localhost:3070/api](http://localhost:3070/api)
+- 📖 **Documentation Swagger** : [http://localhost:3070/api/docs](http://localhost:3070/api/docs)
+- ❤️ **Healthcheck** : [http://localhost:3070/api/health](http://localhost:3070/api/health)
